@@ -57,6 +57,36 @@
     "role": "ROS 2 node entrypoints (*_node.py) — thin wrappers over core/.",
     "origin": "inductive",
     "enforced": true
+   },
+   {
+    "path": ".omp/env",
+    "role": "Docker environment asset canon (Dockerfile/compose/entrypoint/.env.example) managed by omp-env; repo docker/ dirs are hash-synced copies.",
+    "origin": "omp-env (2026-07-23)",
+    "enforced": false
+   },
+   {
+    "path": "src/stonefish_sim/docker",
+    "role": "sync copy of .omp/env canon (keep hash-identical; edit canon only).",
+    "origin": "omp-env (2026-07-23)",
+    "enforced": false
+   },
+   {
+    "path": "src/stonefish_slam/docker",
+    "role": "sync copy of .omp/env canon (keep hash-identical; edit canon only).",
+    "origin": "omp-env (2026-07-23)",
+    "enforced": false
+   },
+   {
+    "path": ".omx",
+    "role": "omx experiment-analysis state — profile/ is team-shared (committed), rest local. Excluded from audit.",
+    "origin": "omx init (2026-07-23)",
+    "enforced": false
+   },
+   {
+    "path": "experiments",
+    "role": "omx run output tree (SSOT, data; schema in .omx/profile/tree.yaml). Not in git; excluded from audit.",
+    "origin": "omx init (2026-07-23)",
+    "enforced": false
    }
   ]
  },

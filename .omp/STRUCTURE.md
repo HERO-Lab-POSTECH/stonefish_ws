@@ -30,6 +30,8 @@ convention: **colcon-workspace** (`src/` 소스 + `install/` 빌드 산출물)
 - `.../thruster_manager/launch/{build,install,log}/**` — src 내부 중첩 colcon 아티팩트 (COLCON_IGNORE 마커 확인됨)
 - `.../stonefish_slam/cpp/pybind11/**` — 벤더드 서드파티 (자체 CMakeLists + tests)
 - `.omc/**`, `.omp/**` — omc/omp 내부 상태
+- `.omx/**`, `experiments/**` — omx 상태·런 출력 트리 (2026-07-23 추가)
+- `.sp/**` — superpowers 스크래치 (2026-07-23 추가)
 
 ## 관찰됐으나 규칙은 아닌 것
 
