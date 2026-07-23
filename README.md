@@ -27,7 +27,7 @@ vcs import src < stonefish.repos        # pip install vcstool (없으면)
 # 2) 컨테이너 (GPU + X11)
 xhost +SI:localuser:$(id -un)
 cd src/stonefish_sim/docker
-UID=$(id -u) GID=$(id -g) docker compose up -d --build
+HOST_UID=$(id -u) HOST_GID=$(id -g) docker compose up -d --build
 docker compose exec stonefish-dev bash
 
 # 3) 컨테이너 안: 빌드 & 실행
