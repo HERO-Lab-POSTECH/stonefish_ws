@@ -7,7 +7,7 @@ ROS 2 + colcon 워크스페이스. **수중 로봇 시뮬레이터 Stonefish** �
 - **시뮬레이션**: Stonefish 수중 물리 시뮬레이터 + ROS 2 브리지(`stonefish_ros2`). BlueROV2·BlueBoat 등 수중 로봇과 난파선·터빈·해저 지형 같은 3D 환경을 시뮬레이션합니다.
 - **제어**: DP(dynamic positioning) 컨트롤러, 스러스터 할당, 궤적 추종. PID 게인은 수동 설정값을 사용합니다(`stonefish_control`의 config). 과거의 GWO·SMAC3 PID 옵티마이저(`stonefish_control_utils`)는 실제 게인 산출에 쓰이지 않아 제거됨.
 - **SLAM**: Python(`core/` — factor_graph, localization(+FFT), mapping_2d/3d, cfar, dead_reckoning)과 C++(`cpp/` + pybind11 바인딩)로 구현한 수중 SLAM. (kalman은 P4에서 제거됨)
-- **팀 배포**(2026-07-23~): Docker 환경 정본은 `.omp/env/`(사본: 각 repo `docker/`), 협업 규칙은 워크스페이스 `CONTRIBUTING.md`, 실험 분석 프로파일은 `.omx/profile/`. 워크스페이스 루트가 meta-repo(git)로 관리됨.
+- **팀 배포**(2026-07-23~): Docker 배포 정본은 전용 repo [stonefish_bringup](https://github.com/HERO-Lab-POSTECH/stonefish_bringup)(멀티스테이지, core+sim+slam 소스 bake — 호스트 실빌드 검증 완료). `.omp/env/`는 그 동기화 미러(구 bind-mount 키트·repo `docker/` 사본은 제거됨). 협업 규칙은 워크스페이스 `CONTRIBUTING.md`, 실험 분석 프로파일은 `.omx/profile/`. 워크스페이스 루트가 meta-repo(git)로 관리됨.
 
 ## 핵심 구조 한눈에
 

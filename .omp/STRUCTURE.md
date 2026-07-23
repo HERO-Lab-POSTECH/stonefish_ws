@@ -16,8 +16,7 @@ convention: **colcon-workspace** (`src/` 소스 + `install/` 빌드 산출물)
 | `src/stonefish_sim/stonefish_description/data/worlds` | 월드 씬 파일 (.scn) + 메시 — 시뮬레이터 월드 정의 | ❌ | inductive (strong) |
 | `src/stonefish_slam/stonefish_slam/core` | SLAM 핵심 알고리즘 모듈 (Python, snake_case) | ✅ | inductive (strong) |
 | `src/stonefish_slam/stonefish_slam/nodes` | ROS 2 노드 진입점 (`*_node.py`) — core/의 얇은 래퍼 | ✅ | inductive (strong) |
-| `.omp/env` | Docker 환경 자산 정본 (Dockerfile·compose·entrypoint·.env.example). repo의 `docker/`는 동기화 사본 — 정본만 수정 | ❌ | omp-env (2026-07-23) |
-| `src/*/docker` | `.omp/env` 정본의 배포 사본 (해시 동일 유지) | ❌ | omp-env (2026-07-23) |
+| `.omp/env` | Docker 환경 자산 미러 — 정본(SSOT)은 [stonefish_bringup](https://github.com/HERO-Lab-POSTECH/stonefish_bringup) repo. byte-identical 유지, 수정은 bringup에서 | ❌ | omp-env (2026-07-23, bringup 이관) |
 | `.omx` | omx 실험 분석 상태 — `profile/`만 팀 공유(커밋), 나머지 로컬 | ❌ | omx init (2026-07-23) |
 | `experiments` | omx 런 출력 트리(SSOT, 데이터) — git 비공유, tree.yaml이 스키마 | ❌ | omx init (2026-07-23) |
 

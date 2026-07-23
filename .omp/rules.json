@@ -1,179 +1,167 @@
 {
- "omp_version": "0.3.0",
- "project": {
-  "name": "stonefish-ws",
-  "preset_origin": "research-lab",
-  "initialized": "2026-06-23",
-  "last_codified": "2026-06-23"
- },
- "specificity": 0.941,
- "structure": {
-  "convention": "colcon-workspace",
-  "directories": [
-   {
-    "path": "src",
-    "role": "source root — all hand-written code; vcstool (stonefish.repos) clones git repos here. The only tree omp audits.",
-    "origin": "inductive",
-    "enforced": true
-   },
-   {
-    "path": "install",
-    "role": "colcon build artifact tree (~671MB, regenerable, no source). Never edit; excluded from audit.",
-    "origin": "inductive",
-    "enforced": false
-   },
-   {
-    "path": "src/stonefish_sim",
-    "role": "git repo HERO-Lab-POSTECH/stonefish_sim — simulator-side ROS 2 packages (description, control, ros2 bridge).",
-    "origin": "inductive",
-    "enforced": false
-   },
-   {
-    "path": "src/stonefish_slam",
-    "role": "git repo HERO-Lab-POSTECH/stonefish_slam — SLAM packages (Python core/nodes + C++ algos).",
-    "origin": "inductive",
-    "enforced": false
-   },
-   {
-    "path": "src/stonefish_sim/stonefish_description/data",
-    "role": "3D assets only (meshes/textures/scene files, ~621MB, 0 code). Dataset-candidate region — see manifest seed.",
-    "origin": "preset",
-    "enforced": false
-   },
-   {
-    "path": "src/stonefish_sim/stonefish_description/data/worlds",
-    "role": "world scene files (.scn) plus their meshes — simulator world definitions.",
-    "origin": "inductive",
-    "enforced": false
-   },
-   {
-    "path": "src/stonefish_slam/stonefish_slam/core",
-    "role": "SLAM core algorithm modules (Python, snake_case).",
-    "origin": "inductive",
-    "enforced": true
-   },
-   {
-    "path": "src/stonefish_slam/stonefish_slam/nodes",
-    "role": "ROS 2 node entrypoints (*_node.py) — thin wrappers over core/.",
-    "origin": "inductive",
-    "enforced": true
-   },
-   {
-    "path": ".omp/env",
-    "role": "Docker environment asset canon (Dockerfile/compose/entrypoint/.env.example) managed by omp-env; repo docker/ dirs are hash-synced copies.",
-    "origin": "omp-env (2026-07-23)",
-    "enforced": false
-   },
-   {
-    "path": "src/stonefish_sim/docker",
-    "role": "sync copy of .omp/env canon (keep hash-identical; edit canon only).",
-    "origin": "omp-env (2026-07-23)",
-    "enforced": false
-   },
-   {
-    "path": "src/stonefish_slam/docker",
-    "role": "sync copy of .omp/env canon (keep hash-identical; edit canon only).",
-    "origin": "omp-env (2026-07-23)",
-    "enforced": false
-   },
-   {
-    "path": ".omx",
-    "role": "omx experiment-analysis state — profile/ is team-shared (committed), rest local. Excluded from audit.",
-    "origin": "omx init (2026-07-23)",
-    "enforced": false
-   },
-   {
-    "path": "experiments",
-    "role": "omx run output tree (SSOT, data; schema in .omx/profile/tree.yaml). Not in git; excluded from audit.",
-    "origin": "omx init (2026-07-23)",
-    "enforced": false
-   }
+  "omp_version": "0.3.0",
+  "project": {
+    "name": "stonefish-ws",
+    "preset_origin": "research-lab",
+    "initialized": "2026-06-23",
+    "last_codified": "2026-06-23"
+  },
+  "specificity": 0.941,
+  "structure": {
+    "convention": "colcon-workspace",
+    "directories": [
+      {
+        "path": "src",
+        "role": "source root — all hand-written code; vcstool (stonefish.repos) clones git repos here. The only tree omp audits.",
+        "origin": "inductive",
+        "enforced": true
+      },
+      {
+        "path": "install",
+        "role": "colcon build artifact tree (~671MB, regenerable, no source). Never edit; excluded from audit.",
+        "origin": "inductive",
+        "enforced": false
+      },
+      {
+        "path": "src/stonefish_sim",
+        "role": "git repo HERO-Lab-POSTECH/stonefish_sim — simulator-side ROS 2 packages (description, control, ros2 bridge).",
+        "origin": "inductive",
+        "enforced": false
+      },
+      {
+        "path": "src/stonefish_slam",
+        "role": "git repo HERO-Lab-POSTECH/stonefish_slam — SLAM packages (Python core/nodes + C++ algos).",
+        "origin": "inductive",
+        "enforced": false
+      },
+      {
+        "path": "src/stonefish_sim/stonefish_description/data",
+        "role": "3D assets only (meshes/textures/scene files, ~621MB, 0 code). Dataset-candidate region — see manifest seed.",
+        "origin": "preset",
+        "enforced": false
+      },
+      {
+        "path": "src/stonefish_sim/stonefish_description/data/worlds",
+        "role": "world scene files (.scn) plus their meshes — simulator world definitions.",
+        "origin": "inductive",
+        "enforced": false
+      },
+      {
+        "path": "src/stonefish_slam/stonefish_slam/core",
+        "role": "SLAM core algorithm modules (Python, snake_case).",
+        "origin": "inductive",
+        "enforced": true
+      },
+      {
+        "path": "src/stonefish_slam/stonefish_slam/nodes",
+        "role": "ROS 2 node entrypoints (*_node.py) — thin wrappers over core/.",
+        "origin": "inductive",
+        "enforced": true
+      },
+      {
+        "path": ".omp/env",
+        "role": "Docker env asset mirror synced from HERO-Lab-POSTECH/stonefish_bringup (the SSOT repo; multi-stage baked-source image). Keep byte-identical to bringup; edit there.",
+        "origin": "omp-env (2026-07-23, bringup supersession)",
+        "enforced": false
+      },
+      {
+        "path": ".omx",
+        "role": "omx experiment-analysis state — profile/ is team-shared (committed), rest local. Excluded from audit.",
+        "origin": "omx init (2026-07-23)",
+        "enforced": false
+      },
+      {
+        "path": "experiments",
+        "role": "omx run output tree (SSOT, data; schema in .omx/profile/tree.yaml). Not in git; excluded from audit.",
+        "origin": "omx init (2026-07-23)",
+        "enforced": false
+      }
+    ]
+  },
+  "naming": {
+    "patterns": [
+      {
+        "applies_to": "src/*/",
+        "regex": "^stonefish_[a-z][a-z0-9_]+$",
+        "description": "ROS 2 package directories use the stonefish_<name> snake_case prefix (9/9 observed).",
+        "origin": "inductive",
+        "severity": "warn"
+      },
+      {
+        "applies_to": "src/**/*.py",
+        "regex": "^[a-z][a-z0-9_]+\\.py$",
+        "description": "Python modules are snake_case (excludes __init__, _-prefixed, and *.launch.py). 53/53, 26/26 observed.",
+        "origin": "inductive",
+        "severity": "warn"
+      },
+      {
+        "applies_to": "src/**/launch/*.launch.py",
+        "regex": "^[a-z][a-z0-9_]+\\.launch\\.py$",
+        "description": "ROS 2 launch files are snake_case ending .launch.py (16/16 observed).",
+        "origin": "inductive",
+        "severity": "warn"
+      },
+      {
+        "applies_to": "src/**/msg/*.msg",
+        "regex": "^[A-Z][A-Za-z0-9]+\\.msg$",
+        "description": "ROS 2 message interface files are PascalCase .msg (part of 23/23 observed across msg+srv).",
+        "origin": "inductive",
+        "severity": "warn"
+      },
+      {
+        "applies_to": "src/**/srv/*.srv",
+        "regex": "^[A-Z][A-Za-z0-9]+\\.srv$",
+        "description": "ROS 2 service interface files are PascalCase .srv (part of 23/23 observed across msg+srv).",
+        "origin": "inductive",
+        "severity": "warn"
+      },
+      {
+        "applies_to": "src/**/config/*.yaml",
+        "regex": "^([a-z][a-z0-9_]+|[A-Z][A-Z0-9_]+)\\.yaml$",
+        "description": "Config YAML files are snake_case (24/24 observed); uppercase acronyms (e.g. TAM = Thruster Allocation Matrix) are an allowed exception. PascalCase (e.g. Hybrid.yaml) is still flagged.",
+        "origin": "inductive",
+        "severity": "warn"
+      },
+      {
+        "applies_to": "src/**/scenarios/*.scn",
+        "regex": "^[a-z][a-z0-9_]+\\.scn$",
+        "description": "Stonefish scenario/world scene files are snake_case .scn (31/31 observed across scenarios + data/worlds).",
+        "origin": "inductive",
+        "severity": "warn"
+      },
+      {
+        "applies_to": "src/**/data/worlds/*.scn",
+        "regex": "^[a-z][a-z0-9_]+\\.scn$",
+        "description": "World .scn files are snake_case (31/31 observed). Note: world_ prefix subpattern (6/31) is a weak observation, NOT enforced.",
+        "origin": "inductive",
+        "severity": "warn"
+      },
+      {
+        "applies_to": "src/**/stonefish_ros2/{src,include}/**/ROS2*.{cpp,h}",
+        "regex": "^ROS2[A-Z][A-Za-z]+\\.(cpp|h)$",
+        "description": "C++ ROS 2 bridge classes use the ROS2<Name> PascalCase prefix (10/10 in the package's inner stonefish_ros2/ subdir). The 2 snake_case node entrypoints (stonefish_simulator.cpp / stonefish_simulator_nogpu.cpp) live directly under src/ and are deliberately outside this glob — info-only, not enforced.",
+        "origin": "inductive",
+        "severity": "info"
+      }
+    ]
+  },
+  "ignore": [
+    "**/.git/**",
+    "**/__pycache__/**",
+    "install/**",
+    "src/stonefish_sim/stonefish_control/stonefish_thruster_manager/launch/build/**",
+    "src/stonefish_sim/stonefish_control/stonefish_thruster_manager/launch/install/**",
+    "src/stonefish_sim/stonefish_control/stonefish_thruster_manager/launch/log/**",
+    "src/stonefish_slam/stonefish_slam/cpp/pybind11/**",
+    ".omc/**",
+    ".omp/**",
+    ".omx/**",
+    "experiments/**",
+    ".sp/**"
+  ],
+  "learned_refs": [
+    "codify-2026-06-23: specificity recomputed per learning-protocol.md §4 over current rule items (structure 8 + naming 9 = 17, inductive 16 + preset 1 -> 16/17); optimizer/output structure+ignore rules already removed from disk (stonefish_control_utils package deleted), so denominator shrank vs init",
+    "codify-2026-06-23: naming cpp_ros2 applies_to fixed (src/stonefish_ros2/{src,include}/* -> src/**/stonefish_ros2/{src,include}/**/ROS2*.{cpp,h}); real package one level deeper at src/stonefish_sim/stonefish_ros2/, ROS2* files in inner stonefish_ros2/ subdir — now matches 10, excludes 2 entrypoints",
+    "codify-2026-06-23: naming config yaml regex extended to allow all-uppercase acronyms (TAM.yaml = Thruster Allocation Matrix); PascalCase still flagged"
   ]
- },
- "naming": {
-  "patterns": [
-   {
-    "applies_to": "src/*/",
-    "regex": "^stonefish_[a-z][a-z0-9_]+$",
-    "description": "ROS 2 package directories use the stonefish_<name> snake_case prefix (9/9 observed).",
-    "origin": "inductive",
-    "severity": "warn"
-   },
-   {
-    "applies_to": "src/**/*.py",
-    "regex": "^[a-z][a-z0-9_]+\\.py$",
-    "description": "Python modules are snake_case (excludes __init__, _-prefixed, and *.launch.py). 53/53, 26/26 observed.",
-    "origin": "inductive",
-    "severity": "warn"
-   },
-   {
-    "applies_to": "src/**/launch/*.launch.py",
-    "regex": "^[a-z][a-z0-9_]+\\.launch\\.py$",
-    "description": "ROS 2 launch files are snake_case ending .launch.py (16/16 observed).",
-    "origin": "inductive",
-    "severity": "warn"
-   },
-   {
-    "applies_to": "src/**/msg/*.msg",
-    "regex": "^[A-Z][A-Za-z0-9]+\\.msg$",
-    "description": "ROS 2 message interface files are PascalCase .msg (part of 23/23 observed across msg+srv).",
-    "origin": "inductive",
-    "severity": "warn"
-   },
-   {
-    "applies_to": "src/**/srv/*.srv",
-    "regex": "^[A-Z][A-Za-z0-9]+\\.srv$",
-    "description": "ROS 2 service interface files are PascalCase .srv (part of 23/23 observed across msg+srv).",
-    "origin": "inductive",
-    "severity": "warn"
-   },
-   {
-    "applies_to": "src/**/config/*.yaml",
-    "regex": "^([a-z][a-z0-9_]+|[A-Z][A-Z0-9_]+)\\.yaml$",
-    "description": "Config YAML files are snake_case (24/24 observed); uppercase acronyms (e.g. TAM = Thruster Allocation Matrix) are an allowed exception. PascalCase (e.g. Hybrid.yaml) is still flagged.",
-    "origin": "inductive",
-    "severity": "warn"
-   },
-   {
-    "applies_to": "src/**/scenarios/*.scn",
-    "regex": "^[a-z][a-z0-9_]+\\.scn$",
-    "description": "Stonefish scenario/world scene files are snake_case .scn (31/31 observed across scenarios + data/worlds).",
-    "origin": "inductive",
-    "severity": "warn"
-   },
-   {
-    "applies_to": "src/**/data/worlds/*.scn",
-    "regex": "^[a-z][a-z0-9_]+\\.scn$",
-    "description": "World .scn files are snake_case (31/31 observed). Note: world_ prefix subpattern (6/31) is a weak observation, NOT enforced.",
-    "origin": "inductive",
-    "severity": "warn"
-   },
-   {
-    "applies_to": "src/**/stonefish_ros2/{src,include}/**/ROS2*.{cpp,h}",
-    "regex": "^ROS2[A-Z][A-Za-z]+\\.(cpp|h)$",
-    "description": "C++ ROS 2 bridge classes use the ROS2<Name> PascalCase prefix (10/10 in the package's inner stonefish_ros2/ subdir). The 2 snake_case node entrypoints (stonefish_simulator.cpp / stonefish_simulator_nogpu.cpp) live directly under src/ and are deliberately outside this glob — info-only, not enforced.",
-    "origin": "inductive",
-    "severity": "info"
-   }
-  ]
- },
- "ignore": [
-  "**/.git/**",
-  "**/__pycache__/**",
-  "install/**",
-  "src/stonefish_sim/stonefish_control/stonefish_thruster_manager/launch/build/**",
-  "src/stonefish_sim/stonefish_control/stonefish_thruster_manager/launch/install/**",
-  "src/stonefish_sim/stonefish_control/stonefish_thruster_manager/launch/log/**",
-  "src/stonefish_slam/stonefish_slam/cpp/pybind11/**",
-  ".omc/**",
-  ".omp/**",
-  ".omx/**",
-  "experiments/**",
-  ".sp/**"
- ],
- "learned_refs": [
-  "codify-2026-06-23: specificity recomputed per learning-protocol.md §4 over current rule items (structure 8 + naming 9 = 17, inductive 16 + preset 1 -> 16/17); optimizer/output structure+ignore rules already removed from disk (stonefish_control_utils package deleted), so denominator shrank vs init",
-  "codify-2026-06-23: naming cpp_ros2 applies_to fixed (src/stonefish_ros2/{src,include}/* -> src/**/stonefish_ros2/{src,include}/**/ROS2*.{cpp,h}); real package one level deeper at src/stonefish_sim/stonefish_ros2/, ROS2* files in inner stonefish_ros2/ subdir — now matches 10, excludes 2 entrypoints",
-  "codify-2026-06-23: naming config yaml regex extended to allow all-uppercase acronyms (TAM.yaml = Thruster Allocation Matrix); PascalCase still flagged"
- ]
 }

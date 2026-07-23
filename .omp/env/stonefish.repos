@@ -1,0 +1,13 @@
+repositories:
+  stonefish:
+    type: git
+    url: https://github.com/HERO-Lab-POSTECH/stonefish.git
+    version: main
+  stonefish_sim:
+    type: git
+    url: https://github.com/HERO-Lab-POSTECH/stonefish_sim.git
+    version: main
+  stonefish_slam:
+    type: git
+    url: https://github.com/HERO-Lab-POSTECH/stonefish_slam.git
+    version: main

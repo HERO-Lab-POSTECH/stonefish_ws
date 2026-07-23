@@ -1,110 +1,70 @@
-# syntax=docker/dockerfile:1
-# ============================================================================
-# stonefish-ws 팀 개발 환경 — full-stack 단일 이미지 (sim + slam 공용)
-#
-# 정본(canonical): .omp/env/Dockerfile  (omp-env 관리)
-# 배포 사본:       stonefish_sim/docker/Dockerfile, stonefish_slam/docker/Dockerfile
-#   → 사본을 직접 수정하지 말고 정본을 고친 뒤 동기화할 것 (drift는 omp-env가 해시 대조로 탐지)
-#
-# 빌드(레포의 docker/ 디렉토리에서):
-#   docker compose build
-# 베이스 선택 근거: nvidia/cudagl·opengl 이미지는 유지 중단됨 → 현행 표준은
-#   osrf/ros:<distro>-desktop + 호스트 nvidia-container-toolkit 런타임 주입.
-#   (재현성을 digest 고정까지 올리려면 FROM에 @sha256:<digest>를 붙일 것 — DL3007)
-# ============================================================================
-FROM osrf/ros:humble-desktop
+# syntax=docker/dockerfile:1.6
+# ── stage: builder ──────────────────────────────────────────
+FROM ros:humble-ros-base AS builder
 
-SHELL ["/bin/bash", "-c"]
-ENV DEBIAN_FRONTEND=noninteractive
+# stonefish 빌드 의존성 (실측: README Dependencies + CMakeLists find_package)
+#   OpenGL·SDL2·Freetype·OpenMP(REQUIRED) + glm(>=0.9.9). glew는 불필요.
+RUN --mount=type=cache,target=/var/cache/apt \
+    apt-get update && apt-get install -y --no-install-recommends \
+      build-essential cmake git \
+      libgl1-mesa-dev libsdl2-dev libfreetype-dev libglm-dev libomp-dev \
+      python3-vcstool python3-colcon-common-extensions
 
-LABEL org.opencontainers.image.title="stonefish-ws dev environment" \
-      org.opencontainers.image.description="ROS 2 Humble + Stonefish 1.3.0 + SLAM deps for HERO-Lab underwater robotics" \
-      org.opencontainers.image.source="https://github.com/HERO-Lab-POSTECH/stonefish_sim" \
-      org.opencontainers.image.licenses="GPL-3.0"
+# SDL2 함정 (실측: stonefish README) — sdl2-config.cmake의 "-lSDL2 " 뒤 공백 제거.
+RUN sed -i 's/-lSDL2 /-lSDL2/' /usr/lib/x86_64-linux-gnu/cmake/SDL2/sdl2-config.cmake
 
-# ----------------------------------------------------------------------------
-# 1) 시스템 의존성
-#    - Stonefish 코어 빌드 의존(공식 문서 기준 3개): libglm-dev libsdl2-dev libfreetype6-dev
-#    - stonefish_ros2/sim: pcl-conversions, image-transport (desktop에 없는 것 명시)
-#    - stonefish_slam C++: gtsam, libpointmatcher, octomap, pybind11, eigen
-#    - GUI/디버그: mesa-utils(glxinfo로 GPU 렌더러 확인), xvfb(헤드리스 폴백)
-# ----------------------------------------------------------------------------
+# 소스 가져오기 (vcstool)
+WORKDIR /ws
+COPY stonefish.repos .
+RUN mkdir -p src && vcs import src < stonefish.repos
+
+# underlay: stonefish C++ 라이브러리를 /opt/stonefish에 빌드
+WORKDIR /ws/src/stonefish/build
+RUN cmake .. -DCMAKE_INSTALL_PREFIX=/opt/stonefish -DCMAKE_BUILD_TYPE=Release \
+ && make -j"$(nproc)" \
+ && make install
+
+# rosdep가 못 잡는 slam 빌드 의존성 명시 설치 (slam CMakeLists find_package, package.xml 미선언)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
-    libglm-dev \
-    libsdl2-dev \
-    libfreetype6-dev \
-    ros-humble-pcl-conversions \
-    ros-humble-pcl-ros \
-    ros-humble-image-transport \
-    ros-humble-tf2-geometry-msgs \
-    ros-humble-tf-transformations \
-    ros-humble-gtsam \
-    ros-humble-libpointmatcher \
-    ros-humble-octomap-msgs \
-    liboctomap-dev \
-    pybind11-dev \
-    libeigen3-dev \
-    libomp-dev \
-    python3-opencv \
-    python3-scipy \
-    python3-sklearn \
-    python3-matplotlib \
-    python3-pip \
-    python3-pytest \
-    mesa-utils \
-    xvfb \
-    sudo \
-    && rm -rf /var/lib/apt/lists/*
+      liboctomap-dev pybind11-dev \
+ && rm -rf /var/lib/apt/lists/*
 
-# Python 의존 (pip 전용 — apt로 해결 불가한 것만)
-# ⚠️ gtsam: apt의 ros-humble-gtsam은 C++ 전용. Python 바인딩은 pip 필수 (slam README 참조)
-# ⚠️ numpy는 system(1.21.5, apt) 유지 — 업그레이드 시 ROS cv_bridge 등과 ABI 충돌
-RUN pip3 install --no-cache-dir \
-    gtsam==4.2 \
-    shapely \
-    transforms3d
+# rosdep: sim/slam의 package.xml 의존성 설치
+# --skip-keys: stonefish(underlay), ament_python(rosdep DB 미등록), pcl(rosdep DB 미등록)
+WORKDIR /ws
+RUN apt-get update \
+ && rosdep update \
+ && rosdep install --from-paths src --ignore-src -y \
+      --skip-keys "stonefish ament_python pcl" \
+ && rm -rf /var/lib/apt/lists/*
 
-# ----------------------------------------------------------------------------
-# 2) Stonefish 코어 라이브러리 (HERO fork, 1.3.0)
-#    ⚠️ 버전 함정: stonefish_ros2는 find_package(Stonefish REQUIRED 1.3.0) —
-#      CMake ExactVersion 정책이라 코어와 브리지 버전이 정확히 일치해야 함.
-#      upstream master는 1.6.0-dev이므로 반드시 HERO fork를 사용한다.
-#    MAKE_JOBS 기본 4: 저사양 빌드 호스트 OOM 예방 (필요시 --build-arg로 상향)
-# ----------------------------------------------------------------------------
-ARG STONEFISH_REPO=https://github.com/HERO-Lab-POSTECH/stonefish.git
-ARG STONEFISH_REF=main
-ARG MAKE_JOBS=4
-RUN git clone --depth 1 --branch "${STONEFISH_REF}" "${STONEFISH_REPO}" /tmp/stonefish \
-    && cmake -S /tmp/stonefish -B /tmp/stonefish/build -DCMAKE_BUILD_TYPE=Release \
-    && cmake --build /tmp/stonefish/build -j "${MAKE_JOBS}" \
-    && cmake --install /tmp/stonefish/build \
-    && ldconfig \
-    && rm -rf /tmp/stonefish
+# overlay: sim/slam colcon 빌드 (stonefish underlay를 CMAKE_PREFIX_PATH로)
+# stonefish_description/launch 디렉토리가 소스에 없어 cmake install 실패 → 빈 dir 생성
+RUN mkdir -p src/stonefish_sim/stonefish_description/launch \
+ && . /opt/ros/humble/setup.sh \
+ && export CMAKE_PREFIX_PATH=/opt/stonefish:$CMAKE_PREFIX_PATH \
+ && colcon build --merge-install \
+      --cmake-args -DCMAKE_BUILD_TYPE=Release \
+ && rm -rf build log
 
-# ----------------------------------------------------------------------------
-# 3) 비루트 사용자 (bind-mount 파일 소유권을 호스트 사용자와 일치)
-#    UID/GID는 빌드 인자 — compose가 호스트 값(${UID}/${GID})을 넘긴다
-# ----------------------------------------------------------------------------
-ARG USERNAME=dev
-ARG UID=1000
-ARG GID=1000
-RUN groupadd --gid "${GID}" "${USERNAME}" \
-    && useradd --uid "${UID}" --gid "${GID}" -m -s /bin/bash "${USERNAME}" \
-    && echo "${USERNAME} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USERNAME} \
-    && chmod 0440 /etc/sudoers.d/${USERNAME}
+# ── stage: runtime ──────────────────────────────────────────
+FROM ros:humble-ros-base AS runtime
 
-# Qt/X11: MIT-SHM은 컨테이너 경계에서 깨짐(BadAccess) → 비활성화
-ENV QT_X11_NO_MITSHM=1
+# 런타임 의존성 (빌드 도구 없음 = 슬림). slam이 octomap 링크 → liboctomap 런타임 필요.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      libsdl2-2.0-0 libfreetype6 libglm-dev libgomp1 liboctomap1.9 \
+      ros-humble-image-transport ros-humble-cv-bridge \
+      ros-humble-octomap-msgs ros-humble-pcl-conversions ros-humble-pcl-msgs \
+      mesa-utils \
+ && rm -rf /var/lib/apt/lists/*
 
-# 대화형 셸 편의: ROS + 워크스페이스 자동 source
-RUN echo 'source /opt/ros/humble/setup.bash' >> /home/${USERNAME}/.bashrc \
-    && echo '[ -f /workspace/install/setup.bash ] && source /workspace/install/setup.bash' >> /home/${USERNAME}/.bashrc
+# underlay + overlay 산출물만 COPY
+COPY --from=builder /opt/stonefish /opt/stonefish
+COPY --from=builder /ws/install /ws/install
 
+ENV LD_LIBRARY_PATH=/opt/stonefish/lib:${LD_LIBRARY_PATH}
+
+# entrypoint는 Task 5에서 활성화:
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-
-USER ${USERNAME}
-WORKDIR /workspace
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["bash"]
