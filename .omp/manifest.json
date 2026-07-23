@@ -1,0 +1,49 @@
+{
+ "omp_version": "0.3.0",
+ "generated": "2026-06-23T00:00",
+ "managed_by_external": {
+  "tool": "none",
+  "note": "No DVC or git-lfs detected (scanner: external_management_signals). Large 3D assets live in-tree under stonefish_description/data; candidates for omp-dataset registration."
+ },
+ "datasets": [
+  {
+   "id": "stonefish-models-v1",
+   "path": "src/stonefish_sim/stonefish_description/data/models",
+   "sha256": "6c787f6feff1c92cea6fa9b471fb67d506dee5b9eb0dc0b25bab254f0214bc3e",
+   "size_bytes": 610270967,
+   "source": "HERO-Lab-POSTECH/stonefish_sim (vcstool repo, in-tree asset)",
+   "added": "2026-06-23"
+  },
+  {
+   "id": "stonefish-robots-v1",
+   "path": "src/stonefish_sim/stonefish_description/data/robots",
+   "sha256": "b84c8237afc04c6c092cb1cf3fd889d23be52577d984e0a7a3fd173385280282",
+   "size_bytes": 36459688,
+   "source": "HERO-Lab-POSTECH/stonefish_sim (vcstool repo, in-tree asset)",
+   "added": "2026-06-23"
+  },
+  {
+   "id": "stonefish-worlds-v1",
+   "path": "src/stonefish_sim/stonefish_description/data/worlds",
+   "sha256": "60f63d5830f3aafe47bdb97e07b1ec7a11772f747a901d74f30005b5ac6be1e1",
+   "size_bytes": 3532756,
+   "source": "HERO-Lab-POSTECH/stonefish_sim (vcstool repo, in-tree asset)",
+   "added": "2026-06-23"
+  }
+ ],
+ "docker_images": [
+  {
+   "ref": "${DOCKER_NAMESPACE:-hero-lab-postech}/stonefish-dev",
+   "tag": "humble-1.3.0",
+   "dockerfile": ".omp/env/Dockerfile",
+   "compose": ".omp/env/compose.yaml",
+   "sync_views": [
+    "src/stonefish_sim/docker/",
+    "src/stonefish_slam/docker/"
+   ],
+   "backup": null,
+   "size": null,
+   "digest": null
+  }
+ ]
+}
