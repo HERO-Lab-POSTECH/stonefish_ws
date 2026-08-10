@@ -8,7 +8,7 @@
 
 | 적용 대상 | 패턴 | 예시 | 관찰 |
 |:---|:---|:---|:---|
-| `src/*/` ROS 2 패키지 디렉토리 | `^stonefish_[a-z][a-z0-9_]+$` | `stonefish_control`, `stonefish_slam`, `stonefish_msgs` | 9/9 |
+| `src/*/` ROS 2 패키지 디렉토리 | `^stonefish_[a-z][a-z0-9_]+$` | `stonefish_control`, `stonefish_slam`, `stonefish_albc_bridge` | 9/9 |
 | `src/**/*.py` Python 모듈 | `^[a-z][a-z0-9_]+\.py$` | `kalman.py`, `dead_reckoning.py` | 53/53, 26/26 (※ `__init__`·`_`접두·`*.launch.py` 제외) |
 | `src/**/launch/*.launch.py` | `^[a-z][a-z0-9_]+\.launch\.py$` | `slam.launch.py`, `thruster_manager.launch.py` | 16/16 |
 | `src/**/msg/*.msg` ROS 인터페이스 | `^[A-Z][A-Za-z0-9]+\.msg$` | `DVL.msg`, `NEDPose.msg`, `ThrusterState.msg` | (msg+srv 23/23 중) |
