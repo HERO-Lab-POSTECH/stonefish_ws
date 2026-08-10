@@ -26,3 +26,7 @@
 __pycache__/
 .env
 .omp/state/
+# Added by code-review-graph
+.code-review-graph/
+# graphify knowledge-graph index (build artifact)
+.graphify/
