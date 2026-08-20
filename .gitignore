@@ -30,3 +30,6 @@ __pycache__/
 .code-review-graph/
 # graphify knowledge-graph index (build artifact)
 .graphify/
+
+# per-machine MCP server config (absolute cwd) — not shared
+.mcp.json
