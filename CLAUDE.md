@@ -147,3 +147,68 @@ import`는 이 설계를 깹니다. slam에는 형제 절대 import까지 stub�
 (전대문자 약어는 예외 — `TAM.yaml` 통과, `Tam.yaml`은 위반), 씬 파일 `snake_case.scn`.
 규칙을 바꿀 때는 `rules.json`과 `STRUCTURE.md`/`NAMING.md`를 **같은 작업 안에서** 함께
 갱신합니다(둘의 drift 금지).
+
+<!-- code-review-graph MCP tools -->
+## MCP Tools: code-review-graph
+
+**IMPORTANT: This project has a knowledge graph. ALWAYS use the
+code-review-graph MCP tools BEFORE using Grep/Glob/Read to explore
+the codebase.** The graph is faster, cheaper (fewer tokens), and gives
+you structural context (callers, dependents, test coverage) that file
+scanning cannot.
+
+신뢰 규칙 정본은 [`.claude/rules/code-review-graph.md`](.claude/rules/code-review-graph.md) —
+그래프가 언제 조용히 실패하는지가 거기 있습니다.
+
+### 그래프는 루트가 아니라 하위 repo에 있습니다 — `repo_root` 필수
+
+**모든 조회에 `repo_root`를 넘기세요.** 워크스페이스 루트에는 그래프가 없습니다:
+meta-repo는 `src/`를 gitignore하고 code-review-graph는 `git ls-files`로 파일을 모으므로,
+루트에서 빌드하면 `.omp/env`·`.omx/profile` 6개만 잡힙니다. 그래서 그래프는 두 코드 repo에
+따로 있습니다.
+
+| 대상 | `repo_root` |
+|:--|:--|
+| 시뮬·제어 (98파일 · 728노드) | `/workspace/src/stonefish_sim` |
+| SLAM (71파일 · 479노드) | `/workspace/src/stonefish_slam` |
+
+`repo_root`를 생략하면 도구는 **오류가 아니라 `status: "ok"`에 결과 0건**을 돌려줍니다 —
+"그런 심볼은 없다"로 오독하기 딱 좋은 조용한 실패입니다. 어느 repo인지 모를 때는
+`cross_repo_search_tool`을 쓰세요. 두 그래프를 함께 훑고 결과마다 `repo` 태그를 붙입니다
+(레지스트리 `/root/.code-review-graph/registry.json`에 `sim`·`slam`으로 등록됨).
+
+`stonefish_bringup`은 Docker 자산뿐이라 코드 노드가 없어 그래프를 만들지 않았습니다.
+
+인덱싱 범위는 각 repo의 `.code-review-graphignore`가 정합니다 — 코드(`.py`·`.cpp`·`.h`)와
+동작에 영향을 주는 설정(`.yaml`)만 남기고 `docs/`·`*.md`·`.rviz`·3D 메시(`.obj`/`.mtl`)·
+`.scn`·이미지는 제외합니다. 그래프에 문서가 안 보이는 것은 정상입니다.
+
+### When to use graph tools FIRST
+
+- **Exploring code**: `semantic_search_nodes_tool` or `query_graph_tool` instead of Grep
+- **Understanding impact**: `get_impact_radius_tool` instead of manually tracing imports
+- **Code review**: `detect_changes_tool` + `get_review_context_tool` instead of reading entire files
+- **Finding relationships**: `query_graph_tool` with callers_of/callees_of/imports_of/tests_for
+- **Architecture questions**: `get_architecture_overview_tool` + `list_communities_tool`
+
+Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
+
+### Key Tools
+
+| Tool | Use when |
+| ------ | ---------- |
+| `detect_changes_tool` | Reviewing code changes — gives risk-scored analysis |
+| `get_review_context_tool` | Need source snippets for review — token-efficient |
+| `get_impact_radius_tool` | Understanding blast radius of a change |
+| `get_affected_flows_tool` | Finding which execution paths are impacted |
+| `query_graph_tool` | Tracing callers, callees, imports, tests, dependencies |
+| `semantic_search_nodes_tool` | Finding functions/classes by name or keyword |
+| `get_architecture_overview_tool` | Understanding high-level codebase structure |
+| `refactor_tool` | Planning renames, finding dead code |
+
+### Workflow
+
+1. The graph auto-updates on file changes (via hooks).
+2. Use `detect_changes_tool` for code review.
+3. Use `get_affected_flows_tool` to understand impact.
+4. Use `query_graph_tool` pattern="tests_for" to check coverage.
