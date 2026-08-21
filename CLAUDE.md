@@ -106,9 +106,10 @@ constraint)와 `mapping/*`(2D 이미지·3D OctoMap)를 발행합니다. 제어 
 
 **전역 프레임은 양 repo 모두 `world_ned`(NED)**입니다. Stonefish가 월드를 NED로 발행하기 때문에
 정합을 위해 REP-103/105(ENU 규정)에서 의도적으로 벗어난 결정입니다(REP-103의 `_ned` 접미사
-규약은 지킴). 반면 **slam의 로컬 TF 체인 `odom→base_link`는 REP-105 ENU를 유지**합니다
-(`core/dead_reckoning.py`). 두 계열을 잇는 TF publisher는 identity라 실제 회전 변환은 없고
-프레임 **이름**만 다릅니다 — 통합 작업 시 이 경계만 주의하면 됩니다. 근거는 각 repo
+규약은 지킴). **slam의 로컬 TF 체인 `odom→base_link`도 프레임 이름만 REP-105에서 빌렸을 뿐
+데이터는 NED(z-down)**입니다(`core/dead_reckoning.py` — 2026-08-21 소비자 전수 추적으로
+이전의 "로컬 ENU 유지" 기술이 반증됨: `/dead_reck/*` 구독자 0, 변환 부재, 체인 전체 NED
+자기정합). 모든 TF는 identity라 좌표 변환 없이 이름 층위만 정합합니다. 근거는 각 repo
 `docs/CONVENTIONS.md` §2.0.
 
 ### 테스트가 모듈을 파일 경로로 로드하는 이유
