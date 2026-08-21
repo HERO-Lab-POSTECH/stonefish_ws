@@ -122,8 +122,9 @@ import`는 이 설계를 깹니다. slam에는 형제 절대 import까지 stub�
 
 ### 버전 동기
 
-9개 `package.xml`이 하나의 버전(현재 0.4.0)으로 통일돼 있습니다. 릴리스 시 repo 내 **모든**
-`package.xml`을 함께 올리고 `CHANGELOG.md`(Keep a Changelog) 정리 후 annotated tag를 답니다.
+버전은 **repo 단위로** 동기합니다 — sim의 8개 `package.xml`은 0.5.0, slam은 0.4.0.
+릴리스 시 해당 repo 내 **모든** `package.xml`을 함께 올리고 `CHANGELOG.md`(Keep a
+Changelog) 정리 후 annotated tag를 답니다.
 
 ## 협업 규칙 (정본: `CONTRIBUTING.md`)
 
@@ -169,8 +170,8 @@ meta-repo는 `src/`를 gitignore하고 code-review-graph는 `git ls-files`로 �
 
 | 대상 | `repo_root` |
 |:--|:--|
-| 시뮬·제어 (98파일 · 728노드) | `/workspace/src/stonefish_sim` |
-| SLAM (71파일 · 479노드) | `/workspace/src/stonefish_slam` |
+| 시뮬·제어 (97파일 · 771노드) | `/workspace/src/stonefish_sim` |
+| SLAM (69파일 · 479노드) | `/workspace/src/stonefish_slam` |
 
 `repo_root`를 생략하면 도구는 **오류가 아니라 `status: "ok"`에 결과 0건**을 돌려줍니다 —
 "그런 심볼은 없다"로 오독하기 딱 좋은 조용한 실패입니다. 어느 repo인지 모를 때는
