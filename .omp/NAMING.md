@@ -8,7 +8,7 @@
 
 | 적용 대상 | 패턴 | 예시 | 관찰 |
 |:---|:---|:---|:---|
-| `src/*/` ROS 2 패키지 디렉토리 | `^stonefish_[a-z][a-z0-9_]+$` | `stonefish_control`, `stonefish_slam`, `stonefish_albc_bridge` | 9/9 |
+| `src/*/` ROS 2 패키지 디렉토리 | `^(stonefish_[a-z][a-z0-9_]+\|nav_interfaces)$` | `stonefish_control`, `stonefish_slam`, `stonefish_albc_bridge` (명시 예외: `nav_interfaces`) | 9/9 |
 | `src/**/*.py` Python 모듈 | `^[a-z][a-z0-9_]+\.py$` | `kalman.py`, `dead_reckoning.py` | 53/53, 26/26 (※ `__init__`·`_`접두·`*.launch.py` 제외) |
 | `src/**/launch/*.launch.py` | `^[a-z][a-z0-9_]+\.launch\.py$` | `slam.launch.py`, `thruster_manager.launch.py` | 16/16 |
 | `src/**/msg/*.msg` ROS 인터페이스 | `^[A-Z][A-Za-z0-9]+\.msg$` | `DVL.msg`, `NEDPose.msg`, `ThrusterState.msg` | (msg+srv 23/23 중) |
@@ -35,4 +35,9 @@
 
 ## 변경 이력
 
+- **2026-08-22 (codify)**: 패키지 디렉토리 정규식에 명시 예외 `nav_interfaces` 추가 —
+  실해역(KMU/LIG) bag에 기록된 메시지 타입명이 패키지명을 고정하므로(rosbag 타입 매칭)
+  `stonefish_` 접두사 개명이 bag 디코드를 깨뜨림. 같은 통합(sim repo
+  `feat/mjkim-integration`)의 `sonar_yolo_ros2`는 반대로 `stonefish_sonar_yolo`로
+  개명(albc 선례) — 예외는 데이터 호환이 강제하는 경우에만.
 - **2026-06-23 (codify)**: cpp_ros2 글롭 0-매칭 수정(실제 패키지 `src/stonefish_sim/stonefish_ros2/` 한 단계 깊음 → 10개 매칭, 진입점 2개 글롭 밖). config yaml 정규식에 전대문자 약어 예외 추가(`TAM.yaml` 통과, PascalCase는 계속 위반). specificity 0.80→0.941(§4 재계산; `stonefish_control_utils` 제거로 optimizer 관련 structure 1 + ignore 3 규칙이 디스크에서 이미 빠져 분모 축소, preset 항목은 `data` 1개만 남음 → 16/17).

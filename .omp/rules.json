@@ -82,8 +82,8 @@
     "patterns": [
       {
         "applies_to": "src/*/",
-        "regex": "^stonefish_[a-z][a-z0-9_]+$",
-        "description": "ROS 2 package directories use the stonefish_<name> snake_case prefix (9/9 observed, verified by package.xml enumeration 2026-08-10).",
+        "regex": "^(stonefish_[a-z][a-z0-9_]+|nav_interfaces)$",
+        "description": "ROS 2 package directories use the stonefish_<name> snake_case prefix (9/9 observed, verified by package.xml enumeration 2026-08-10). Explicit exception: nav_interfaces — its message types are recorded in real sea-trial bags and rosbag deserialization matches the package-qualified type name, so renaming would break bag decoding (codify 2026-08-22).",
         "origin": "inductive",
         "severity": "warn"
       },
@@ -163,6 +163,7 @@
     "codify-2026-06-23: specificity recomputed per learning-protocol.md §4 over current rule items (structure 8 + naming 9 = 17, inductive 16 + preset 1 -> 16/17); optimizer/output structure+ignore rules already removed from disk (stonefish_control_utils package deleted), so denominator shrank vs init",
     "codify-2026-06-23: naming cpp_ros2 applies_to fixed (src/stonefish_ros2/{src,include}/* -> src/**/stonefish_ros2/{src,include}/**/ROS2*.{cpp,h}); real package one level deeper at src/stonefish_sim/stonefish_ros2/, ROS2* files in inner stonefish_ros2/ subdir — now matches 10, excludes 2 entrypoints",
     "codify-2026-06-23: naming config yaml regex extended to allow all-uppercase acronyms (TAM.yaml = Thruster Allocation Matrix); PascalCase still flagged",
-    "organize-2026-08-10: albc_bridge -> stonefish_albc_bridge renamed (sim repo cefb904); it was the sole src/*/ violator of the stonefish_ prefix, added after the 2026-06-23 codify so it never passed a rule check. Recount by package.xml enumeration: 9/9 compliant. ROS node name kept as 'albc_bridge' -- sibling packages use bare function names for node names (thruster_allocator, path_generator_node), so the package-prefix rule does not apply to the runtime node axis."
+    "organize-2026-08-10: albc_bridge -> stonefish_albc_bridge renamed (sim repo cefb904); it was the sole src/*/ violator of the stonefish_ prefix, added after the 2026-06-23 codify so it never passed a rule check. Recount by package.xml enumeration: 9/9 compliant. ROS node name kept as 'albc_bridge' -- sibling packages use bare function names for node names (thruster_allocator, path_generator_node), so the package-prefix rule does not apply to the runtime node axis.",
+    "codify-2026-08-22: naming package-dir regex extended with explicit exception nav_interfaces (sim repo feat/mjkim-integration adds it for KMU/LIG sea-trial bag decoding; bag-recorded msg type names pin the package name, so the stonefish_ prefix cannot apply). The other package from the same integration was renamed instead (sonar_yolo_ros2 -> stonefish_sonar_yolo, albc precedent)."
   ]
 }
