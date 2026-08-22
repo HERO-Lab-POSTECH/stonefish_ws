@@ -171,8 +171,8 @@ meta-repo는 `src/`를 gitignore하고 code-review-graph는 `git ls-files`로 �
 
 | 대상 | `repo_root` |
 |:--|:--|
-| 시뮬·제어 (97파일 · 771노드) | `/workspace/src/stonefish_sim` |
-| SLAM (69파일 · 479노드) | `/workspace/src/stonefish_slam` |
+| 시뮬·제어 (103파일 · 906노드) | `/workspace/src/stonefish_sim` |
+| SLAM (86파일 · 625노드) | `/workspace/src/stonefish_slam` |
 
 `repo_root`를 생략하면 도구는 **오류가 아니라 `status: "ok"`에 결과 0건**을 돌려줍니다 —
 "그런 심볼은 없다"로 오독하기 딱 좋은 조용한 실패입니다. 어느 repo인지 모를 때는
