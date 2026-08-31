@@ -22,7 +22,11 @@
 # session/tool state, scratch
 .omc/
 .sp/
-.claude/
+# .claude/ 는 머신 상태(settings.local.json)와 저작물이 섞여 있다.
+# rules/ 만 연다 — CLAUDE.md 가 code-graph.md 를 '신뢰 규칙 정본'으로 링크하므로
+# 추적하지 않으면 클론한 팀원에게는 끊긴 링크가 된다.
+.claude/*
+!.claude/rules/
 __pycache__/
 .env
 .omp/state/
