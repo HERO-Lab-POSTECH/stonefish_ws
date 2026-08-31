@@ -7,14 +7,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 먼저 알아야 할 것 — 여기는 meta-repo, 소스가 아니다
 
-이 저장소가 추적하는 것은 `stonefish.repos` · `CONTRIBUTING.md` · `.omp/` · `.omx/` 뿐입니다.
+이 저장소가 추적하는 것은 `stonefish.repos` · `CONTRIBUTING.md` · `.hq/` 뿐입니다
+(2026-08-31 `.omp/`·`.omx/`를 `.hq/` 한 스토어로 통합했고, legacy 16파일은 롤백
+경로로 아직 추적됩니다).
 **`src/`는 `.gitignore` 대상**이며 그 아래 각 디렉토리가 **독립된 git repo**입니다
 (`stonefish_sim` · `stonefish_slam` · `stonefish_bringup`, 모두 `HERO-Lab-POSTECH` remote).
 
 - 루트에서 `git status`를 봐도 코드 변경은 **보이지 않습니다.** 커밋·브랜치·PR은 반드시
   해당 하위 repo 안에서 (`git -C src/stonefish_slam ...`).
 - 루트 meta-repo와 하위 3개 repo는 **서로 다른 4개의 remote**입니다. 워크스페이스 자체의
-  변경(`stonefish.repos`·`CONTRIBUTING.md`·`.omp/`·`.omx/profile/`)은 meta-repo에,
+  변경(`stonefish.repos`·`CONTRIBUTING.md`·`.hq/`)은 meta-repo에,
   코드 변경은 해당 하위 repo에 각각 push·PR합니다.
 - 하위 repo에서 코드를 만지기 전 그 repo의 `CLAUDE.md`와 **`docs/CONVENTIONS.md`(그 repo의
   SSOT)**를 먼저 읽습니다. 미해결 이슈는 각 repo `P4_FLAGS.md`에 모여 있으니 거기 적힌
@@ -58,7 +60,7 @@ cp build/stonefish_slam/*.so src/stonefish_slam/stonefish_slam/
 양 repo를 한 번에 판정하는 게이트(`.so` 스테이징 포함, 마지막 줄에 `{"pass": bool}` JSON):
 
 ```bash
-bash .omx/profile/evaluator.sh
+bash .hq/config/experiments/profile/evaluator.sh
 ```
 
 ### 시뮬레이터 실행
@@ -75,10 +77,12 @@ ros2 launch stonefish_slam slam.launch.py vehicle_name:=bluerov2   # 터미널 C
 
 ### 거버넌스 도구
 
-`.omp/`(구조·명명 규칙 SSOT)는 oh-my-project 하네스가, `.omx/`(실험 분석 프로파일)는
-oh-my-experiments 하네스가 사용합니다. `omx` CLI는 `/opt/omx-venv`에 설치되어 있습니다
-(`omx doctor --root /workspace`). 실험 런 출력은 `experiments/` 트리가 SSOT이며 git 비공유,
-훈련 launch는 자동 실행하지 않고 사람 승인 큐로만 보냅니다.
+`.hq/` 한 스토어를 oh-my-project(`config/project/` — 구조·명명 규칙 SSOT)와
+oh-my-experiments(`config/experiments/` — 실험 분석 프로파일)가 함께 씁니다. `.hq/.anchor`가
+있으면 두 하네스 모두 legacy `.omp/`·`.omx/`를 더 이상 읽지 않습니다. `omx` CLI는
+`/opt/omx-venv`에 설치되어 있습니다(`omx doctor --root /workspace`). 실험 런 출력은
+`experiments/` 트리가 SSOT이며 git 비공유, 훈련 launch는 자동 실행하지 않고 사람 승인
+큐로만 보냅니다.
 
 ## 아키텍처
 
@@ -89,7 +93,7 @@ oh-my-experiments 하네스가 사용합니다. `omx` CLI는 `/opt/omx-venv`에 
 | `stonefish` (fork, 1.3.0 고정) | Stonefish 코어 C++ 물리·렌더 라이브러리. `stonefish_ros2`가 `find_package(Stonefish REQUIRED 1.3.0)`로 **exact-version** 매치하므로 upstream master(1.6.0-dev)로는 빌드 실패 |
 | `stonefish_sim` | 멀티패키지. `stonefish_ros2`(C++ 시뮬 브리지) · `stonefish_description`(차량·월드 `.scn`·3D 에셋) · `stonefish_msgs`(인터페이스) · `stonefish_control/`(하위에 `stonefish_control`·`stonefish_control_msgs`·`stonefish_thruster_manager`·`stonefish_trajectory_manager` **4개 패키지**) · `stonefish_albc_bridge`(RL 정책 브리지) |
 | `stonefish_slam` | 단일 패키지, Python + pybind11 C++ 혼합. `core/`(알고리즘) · `nodes/`(ROS 진입점, core의 얇은 래퍼) · `utils/` · `cpp/`(바인딩 + 순수 파이썬 fallback) |
-| `stonefish_bringup` | Docker 배포 **정본**. 멀티스테이지로 core+sim+slam을 이미지에 bake. `.omp/env/`는 byte-identical 미러이므로 **수정은 bringup에서** |
+| `stonefish_bringup` | Docker 배포 **정본**. 멀티스테이지로 core+sim+slam을 이미지에 bake. `.hq/config/project/env/`는 byte-identical 미러이므로 **수정은 bringup에서** |
 
 런타임 결합은 토픽으로만 이루어집니다: sim이 `/{vehicle}/fls/image` · `odometry` · `imu` ·
 `dvl` · `pressure`를 발행하고 slam이 구독해 `/stonefish_slam/slam/*`(pose·odom·traj·cloud·
@@ -142,7 +146,7 @@ Changelog) 정리 후 annotated tag를 답니다.
   버튼으로만.
 - 시뮬 physics 파라미터(`.scn`)와 알고리즘 변경을 한 PR에 섞지 않습니다.
 
-## 명명 규칙 (정본: `.omp/rules.json`, 사람용 `.omp/NAMING.md`)
+## 명명 규칙 (정본: `.hq/config/project/rules.json`, 사람용 `.hq/community/NAMING.md`)
 
 `src/` 트리에만 적용되며 audit이 강제합니다: 패키지 디렉토리 `stonefish_<name>`, Python 모듈
 `snake_case.py`, launch `*.launch.py`, msg/srv `PascalCase`, config `snake_case.yaml`
@@ -170,7 +174,7 @@ Changelog) 정리 후 annotated tag를 답니다.
 ### 그래프는 루트가 아니라 하위 repo에 있습니다
 
 **조회는 해당 repo 디렉터리 안에서 하세요.** 워크스페이스 루트에는 그래프가 없습니다 —
-meta-repo가 `src/`를 gitignore하므로 루트에서 빌드하면 `.omp/env`·`.omx/profile` 몇 개만
+meta-repo가 `src/`를 gitignore하므로 루트에서 빌드하면 `.hq/config/` 몇 개만
 잡힙니다. 그래서 그래프는 두 코드 repo에 따로 있습니다.
 
 | 대상 | 위치 | 규모 (2026-08-31 실측) |

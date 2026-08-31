@@ -1,0 +1,8 @@
+{
+  "program_id": "cross-track-tuning",
+  "campaigns": [
+    "cte-sweep"
+  ],
+  "status": "active",
+  "created": "2026-08-23T04:11:35.074253+00:00"
+}
