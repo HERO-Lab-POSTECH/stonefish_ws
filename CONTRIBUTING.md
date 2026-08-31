@@ -90,7 +90,7 @@ stonefish_sim · stonefish_slam · stonefish(fork) 세 repo와 이 워크스페�
 
 - colcon 빌드는 **`--merge-install`로 통일**합니다(기존 install 레이아웃·문서·테스트 경로가
   merge 기준).
-- 명명 규칙(워크스페이스 `.omp/NAMING.md`가 기준): 패키지 `stonefish_<name>`,
+- 명명 규칙(워크스페이스 `.hq/community/NAMING.md`가 기준): 패키지 `stonefish_<name>`,
   Python 모듈 `snake_case.py`, msg/srv `PascalCase`, config `snake_case.yaml`
   (전대문자 약어 예외: `TAM.yaml`), 씬 파일 `snake_case.scn`.
 

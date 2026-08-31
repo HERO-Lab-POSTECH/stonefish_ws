@@ -8,8 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## 먼저 알아야 할 것 — 여기는 meta-repo, 소스가 아니다
 
 이 저장소가 추적하는 것은 `stonefish.repos` · `CONTRIBUTING.md` · `.hq/` 뿐입니다
-(2026-08-31 `.omp/`·`.omx/`를 `.hq/` 한 스토어로 통합했고, legacy 16파일은 롤백
-경로로 아직 추적됩니다).
+(2026-08-31 `.omp/`·`.omx/`를 `.hq/` 한 스토어로 통합했고, legacy 스토어는
+제거됐습니다).
 **`src/`는 `.gitignore` 대상**이며 그 아래 각 디렉토리가 **독립된 git repo**입니다
 (`stonefish_sim` · `stonefish_slam` · `stonefish_bringup`, 모두 `HERO-Lab-POSTECH` remote).
 
@@ -79,7 +79,7 @@ ros2 launch stonefish_slam slam.launch.py vehicle_name:=bluerov2   # 터미널 C
 
 `.hq/` 한 스토어를 oh-my-project(`config/project/` — 구조·명명 규칙 SSOT)와
 oh-my-experiments(`config/experiments/` — 실험 분석 프로파일)가 함께 씁니다. `.hq/.anchor`가
-있으면 두 하네스 모두 legacy `.omp/`·`.omx/`를 더 이상 읽지 않습니다. `omx` CLI는
+있으면 두 하네스 모두 이 앵커를 읽습니다(legacy `.omp/`·`.omx/`는 제거됨). `omx` CLI는
 `/opt/omx-venv`에 설치되어 있습니다(`omx doctor --root /workspace`). 실험 런 출력은
 `experiments/` 트리가 SSOT이며 git 비공유, 훈련 launch는 자동 실행하지 않고 사람 승인
 큐로만 보냅니다.

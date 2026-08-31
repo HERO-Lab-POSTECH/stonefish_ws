@@ -5,7 +5,7 @@
 
 
 # Everything hidden — dot-directories AND dotfiles, at any depth. Tooling config
-# and harness state (.claude/, .omp/, .omx/, .sp/, .omc/, .github/, .mcp.json),
+# and harness state (.claude/, .hq/, .sp/, .omc/, .github/, .mcp.json),
 # never corpus content. Measured here: .omc/ session state alone accounts for
 # most of the 184 json files under src/.
 .*

@@ -3,10 +3,11 @@
 Stonefish 수중 물리 시뮬레이터 위에서 **제어(stonefish_sim)** 와 **SLAM(stonefish_slam)** 을
 개발하는 ROS 2 Humble colcon 워크스페이스의 팀 공용 meta-repo입니다. 이 repo에는 소스가
 아니라 **워크스페이스를 재현하는 데 필요한 것**만 들어 있습니다: repo 목록(`stonefish.repos`),
-협업 규칙(`CONTRIBUTING.md`), 프로젝트 거버넌스(`.omp/`)와 실험 분석 프로파일(`.omx/`).
+협업 규칙(`CONTRIBUTING.md`), 그리고 프로젝트 거버넌스와 실험 분석 프로파일을 함께 담은
+통합 스토어(`.hq/`).
 Docker 배포 환경은 전용 repo
 [stonefish_bringup](https://github.com/HERO-Lab-POSTECH/stonefish_bringup)이 정본입니다
-(`.omp/env/`는 그 동기화 미러).
+(`.hq/config/project/env/`는 그 동기화 미러).
 
 ## 구성 repo
 
@@ -59,10 +60,11 @@ Conventional Commits · PR 승인 1인 · SemVer + Keep a Changelog. 세 repo �
 
 ## 팀 공용 도구
 
-- **`.omp/`** — 프로젝트 구조·명명 규칙 SSOT(`rules.json` + `STRUCTURE.md`/`NAMING.md`).
-  Docker 배포 정본은 [stonefish_bringup](https://github.com/HERO-Lab-POSTECH/stonefish_bringup)
-  repo이며 `.omp/env/`는 그 동기화 미러. 규칙 감사는 oh-my-project 하네스의 `omp-audit`로.
-- **`.omx/`** — SLAM 검증·실험 분석 프로파일(oh-my-experiments 하네스).
+- **`.hq/config/project/`** — 프로젝트 구조·명명 규칙 SSOT(`rules.json` + `STRUCTURE.md`,
+  사람용 `.hq/community/NAMING.md`). Docker 배포 정본은
+  [stonefish_bringup](https://github.com/HERO-Lab-POSTECH/stonefish_bringup) repo이며
+  `.hq/config/project/env/`는 그 동기화 미러. 규칙 감사는 oh-my-project 하네스의 `omp-audit`로.
+- **`.hq/config/experiments/`** — SLAM 검증·실험 분석 프로파일(oh-my-experiments 하네스).
   런 결과는 `experiments/` 트리에 축적(SSOT), 분석은 `exp-analyze`, 다음 실험 설계는
   `exp-design`. CLI 설치(컨테이너/새 머신 1회):
 
@@ -73,7 +75,7 @@ Conventional Commits · PR 승인 1인 · SemVer + Keep a Changelog. 세 repo �
   omx doctor --root /workspace     # preflight
   ```
 
-- `.omx/profile/`의 evaluator(fast gate = 양 repo pytest)는 `omx eval`로 실행됩니다.
+- `.hq/config/experiments/profile/`의 evaluator(fast gate = 양 repo pytest)는 `omx eval`로 실행됩니다.
   현재 프로파일은 **pending approval** — 팀 리뷰 후 `omx profile-seal`로 확정하세요.
 
 ## 레이아웃
@@ -82,8 +84,8 @@ Conventional Commits · PR 승인 1인 · SemVer + Keep a Changelog. 세 repo �
 stonefish_ws/
 ├── stonefish.repos      # vcs import 소스 목록 (main 추적; 릴리스 스냅샷은 태그 핀 사본)
 ├── CONTRIBUTING.md      # 협업 규칙 정본
-├── .omp/                # 구조·명명 규칙 + env 정본 (wiki/·work/는 개인 영역 — 비공유)
-├── .omx/                # 실험 분석 프로파일 (profile/만 공유)
+├── .hq/                 # 통합 스토어 — config/project/(구조·명명 규칙 + env 미러),
+│                     #   config/experiments/(실험 프로파일), community/(팀 공유 지식)
 ├── src/                 # vcs import 대상 (git 관리 밖 — 각자의 repo clone)
 ├── build/ install/ log/ # colcon 산출물 (비공유)
 └── experiments/         # omx 런 출력 트리 (비공유)

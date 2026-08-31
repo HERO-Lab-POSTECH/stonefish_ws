@@ -35,8 +35,8 @@
     {
       "ref": "ghcr.io/hero-lab-postech/stonefish_bringup",
       "tag": "latest",
-      "dockerfile": "https://github.com/HERO-Lab-POSTECH/stonefish_bringup (SSOT; .omp/env/ is a synced mirror)",
-      "compose": ".omp/env/docker-compose.yml (mirror)",
+      "dockerfile": "https://github.com/HERO-Lab-POSTECH/stonefish_bringup (SSOT; .hq/config/project/env/ is a synced mirror)",
+      "compose": ".hq/config/project/env/docker-compose.yml (mirror)",
       "sync_views": [],
       "backup": null,
       "size": "3.76GB (host-verified build, ksm-ubuntu 2026-07-23)",

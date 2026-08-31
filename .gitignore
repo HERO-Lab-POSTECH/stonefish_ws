@@ -9,16 +9,6 @@
 # omx run outputs (SSOT tree, data — not shared via git)
 /experiments/
 
-# omp SSOT sharing policy (chosen at omp-init 2026-06-23)
-# Share rules.json + *.md with the team; wiki/ and work/ are personal/regenerable.
-.omp/wiki/
-.omp/work/
-.omp/secretary/
-
-# omx: share profile/ only; scratch/run artifacts stay local
-.omx/*
-!.omx/profile/
-
 # session/tool state, scratch
 .omc/
 .sp/
@@ -29,7 +19,6 @@
 !.claude/rules/
 __pycache__/
 .env
-.omp/state/
 # graphify knowledge-graph index (build artifact)
 .graphify/
 

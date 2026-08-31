@@ -16,8 +16,8 @@ convention: **colcon-workspace** (`src/` 소스 + `install/` 빌드 산출물)
 | `src/stonefish_sim/stonefish_description/data/worlds` | 월드 씬 파일 (.scn) + 메시 — 시뮬레이터 월드 정의 | ❌ | inductive (strong) |
 | `src/stonefish_slam/stonefish_slam/core` | SLAM 핵심 알고리즘 모듈 (Python, snake_case) | ✅ | inductive (strong) |
 | `src/stonefish_slam/stonefish_slam/nodes` | ROS 2 노드 진입점 (`*_node.py`) — core/의 얇은 래퍼 | ✅ | inductive (strong) |
-| `.omp/env` | Docker 환경 자산 미러 — 정본(SSOT)은 [stonefish_bringup](https://github.com/HERO-Lab-POSTECH/stonefish_bringup) repo. byte-identical 유지, 수정은 bringup에서 | ❌ | omp-env (2026-07-23, bringup 이관) |
-| `.omx` | omx 실험 분석 상태 — `profile/`만 팀 공유(커밋), 나머지 로컬 | ❌ | omx init (2026-07-23) |
+| `.hq/config/project/env` | Docker 환경 자산 미러 — 정본(SSOT)은 [stonefish_bringup](https://github.com/HERO-Lab-POSTECH/stonefish_bringup) repo. byte-identical 유지, 수정은 bringup에서 | ❌ | omp-env (2026-07-23, bringup 이관) |
+| `.hq/config/experiments` | omx 실험 분석 프로파일 — `profile/`이 팀 공유(커밋) | ❌ | omx init (2026-07-23, 2026-08-31 .hq 통합) |
 | `experiments` | omx 런 출력 트리(SSOT, 데이터) — git 비공유, tree.yaml이 스키마 | ❌ | omx init (2026-07-23) |
 
 ## 감사 제외 영역 (ignore)
@@ -28,8 +28,9 @@ convention: **colcon-workspace** (`src/` 소스 + `install/` 빌드 산출물)
 - `install/**` — colcon 빌드 산출물 전체
 - `.../thruster_manager/launch/{build,install,log}/**` — src 내부 중첩 colcon 아티팩트 (COLCON_IGNORE 마커 확인됨)
 - `.../stonefish_slam/cpp/pybind11/**` — 벤더드 서드파티 (자체 CMakeLists + tests)
-- `.omc/**`, `.omp/**` — omc/omp 내부 상태
-- `.omx/**`, `experiments/**` — omx 상태·런 출력 트리 (2026-07-23 추가)
+- `.omc/**` — omc 내부 상태
+- `.hq/**` — 통합 하네스 스토어 (2026-08-31 .omp/·.omx/ 대체)
+- `experiments/**` — omx 런 출력 트리 (2026-07-23 추가)
 - `.sp/**` — superpowers 스크래치 (2026-07-23 추가)
 
 ## 관찰됐으나 규칙은 아닌 것

@@ -59,20 +59,20 @@
         "enforced": true
       },
       {
-        "path": ".omp/env",
+        "path": ".hq/config/project/env",
         "role": "Docker env asset mirror synced from HERO-Lab-POSTECH/stonefish_bringup (the SSOT repo; multi-stage baked-source image). Keep byte-identical to bringup; edit there.",
         "origin": "omp-env (2026-07-23, bringup supersession)",
         "enforced": false
       },
       {
-        "path": ".omx",
-        "role": "omx experiment-analysis state — profile/ is team-shared (committed), rest local. Excluded from audit.",
-        "origin": "omx init (2026-07-23)",
+        "path": ".hq/config/experiments",
+        "role": "omx experiment-analysis profile — profile/ is team-shared (committed). Excluded from audit.",
+        "origin": "omx init (2026-07-23, .hq consolidation 2026-08-31)",
         "enforced": false
       },
       {
         "path": "experiments",
-        "role": "omx run output tree (SSOT, data; schema in .omx/profile/tree.yaml). Not in git; excluded from audit.",
+        "role": "omx run output tree (SSOT, data; schema in .hq/config/experiments/profile/tree.yaml). Not in git; excluded from audit.",
         "origin": "omx init (2026-07-23)",
         "enforced": false
       }
@@ -154,8 +154,7 @@
     "src/stonefish_sim/stonefish_control/stonefish_thruster_manager/launch/log/**",
     "src/stonefish_slam/stonefish_slam/cpp/pybind11/**",
     ".omc/**",
-    ".omp/**",
-    ".omx/**",
+    ".hq/**",
     "experiments/**",
     ".sp/**"
   ],
