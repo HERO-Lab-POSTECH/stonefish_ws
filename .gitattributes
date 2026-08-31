@@ -1,2 +1,3 @@
-.hq/config/migrated.jsonl merge=union
-.hq/config/project/secretary/ledger.jsonl merge=union
+.hq/config/migrated.jsonl                   merge=union
+.hq/config/project/secretary/ledger.jsonl   merge=union
+.hq/config/project/secretary/journal/*.md   merge=union
