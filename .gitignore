@@ -31,3 +31,11 @@ __pycache__/
 
 # per-machine MCP server config (absolute cwd) — not shared
 .mcp.json
+
+# .hq unified store (2026-08-31, .omp+.omx 통합) — store-spec §5 의 네 줄
+**/.hq/work/
+**/.hq/runtime/
+# 루트-로컬 상태 락 디렉터리 — 세션이 락을 쥔 채 죽으면 빈 lockdir 이 남는다
+**/.harness.lock/
+# hq 쓰기 락 — community/(추적 층) 안에 생겨 위 두 줄로는 안 걸린다
+**/.hq/**/.hq-lock
