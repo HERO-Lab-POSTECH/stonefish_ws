@@ -30,6 +30,10 @@
 | D1 | 2026-09-01 | cross-model 상담은 Claude 티어 분리(fable 세션 ↔ opus 분석 ↔ sonnet 스윕)로 수행 | 이 머신에 vendor CLI가 claude뿐(codex·agy·gemini 미설치), CLI 설치는 사람 결정 | 낮음 — CLI 설치 시 vendor 상담으로 전환 | Claude(세션) |
 | D2 | 2026-09-01 | omo 스토어 층(rules/·HUB.md·agents/·sessions/)을 `.hq/community/`에 시드 | 8/31 omp·omx 통합 때 omo 층은 시드된 적 없음 — 사용자 지적으로 발견 | 없음 (추가만) | 사용자 지시 |
 | D3 | 2026-09-01 | codex·agy 설치 완료 — 이후 상담은 wrapper 경유 cross-vendor로 전환 (D1 대체) | D1의 전제(claude-only)가 소멸. 벤더 로더 설치·인증 실측은 다음 세션 프리플라이트에서 | 낮음 — CLI 제거 시 D1 방식 복귀 | 사용자 |
+| D4 | 2026-09-01 | 벤더 로더를 프로젝트 스코프로 설치 — codex `.codex/config.toml`+skills, agy `.agents/skills/` | omo `shared-context.md` 절차. agy는 project scope만 가능(user scope `~/.agents/`는 모든 에이전트 공용이라 오염) | 없음 (추가만, git 미추적) | Claude(세션) |
+| D5 | 2026-09-01 | codex는 `yolo:true` role로만 라우팅한다 | 이 컨테이너에서 bubblewrap이 namespace를 못 만들어 샌드박스 경로의 codex는 파일을 하나도 못 읽으면서 에러 대신 "unavailable"만 답한다(조용한 실패). `explore`·`security`(yolo:false)는 사람이 `~/.codeagent/models.json`을 고쳐야 살아난다 | 낮음 — models.json 1줄 | Claude(세션, 실측) |
+| D6 | 2026-09-01 | 소나 틸트(config 30° vs 실물 80°) 코드 처방을 이번 사이클에서 **보류**하고 계측(I11)을 먼저 붙인다 | 적대 검증 LOC-3: 평탄 해저 무보정 ICP는 병진을 **과소** 추정하며 `cos(tilt)` 곱은 오차를 악화(30°: 0.89→0.77, 80°: 0.18→0.03). 문헌 조사의 "저비용 cos 보정" 권고를 세션이 기각 | 낮음 — 계측 결과가 나오면 그때 처방 | Claude(세션), 사용자 승인 대기 |
+| D7 | 2026-09-01 | god-method 분해(§4.4)와 SSM/NSSM 중복 통합(§4.2)을 이번 사이클에서 **제외** | 특성화 테스트 선작성이 그 자체로 한 사이클 분량이고, 버그 수정과 섞으면 회귀 원인 분리가 불가능 | 중 — 다음 사이클로 예약 | Claude(세션), 사용자 승인 대기 |
 
 Append only. Numbers are globally monotonic and never reused. An overturned decision
 gets a new row naming the one it supersedes; the original stays so the reasoning

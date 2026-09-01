@@ -32,3 +32,8 @@ __pycache__/
 **/.harness.lock/
 # hq 쓰기 락 — community/(추적 층) 안에 생겨 위 두 줄로는 안 걸린다
 **/.hq/**/.hq-lock
+
+# omo vendor context loaders — omo `shared-context.md` 절차로 재생성되는 도구 설정.
+# omo 버전에 결합돼 있어 추적하면 버전 drift 가 그대로 팀에 퍼진다.
+.codex/
+.agents/
