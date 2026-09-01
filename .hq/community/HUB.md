@@ -29,6 +29,7 @@
 |:--|:-----|:---------|:--------|:--------------|:---|
 | D1 | 2026-09-01 | cross-model 상담은 Claude 티어 분리(fable 세션 ↔ opus 분석 ↔ sonnet 스윕)로 수행 | 이 머신에 vendor CLI가 claude뿐(codex·agy·gemini 미설치), CLI 설치는 사람 결정 | 낮음 — CLI 설치 시 vendor 상담으로 전환 | Claude(세션) |
 | D2 | 2026-09-01 | omo 스토어 층(rules/·HUB.md·agents/·sessions/)을 `.hq/community/`에 시드 | 8/31 omp·omx 통합 때 omo 층은 시드된 적 없음 — 사용자 지적으로 발견 | 없음 (추가만) | 사용자 지시 |
+| D3 | 2026-09-01 | codex·agy 설치 완료 — 이후 상담은 wrapper 경유 cross-vendor로 전환 (D1 대체) | D1의 전제(claude-only)가 소멸. 벤더 로더 설치·인증 실측은 다음 세션 프리플라이트에서 | 낮음 — CLI 제거 시 D1 방식 복귀 | 사용자 |
 
 Append only. Numbers are globally monotonic and never reused. An overturned decision
 gets a new row naming the one it supersedes; the original stays so the reasoning
