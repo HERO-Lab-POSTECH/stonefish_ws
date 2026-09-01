@@ -40,6 +40,8 @@ HUB의 D9가 "제외는 즉시 후속 사이클로 예약"이라는 **약속**�
 | N10 | **SIM-M2 `INS.msg` `pose_variance`** 상시 0 — 채울지 없앨지 | 크로스 repo PR 상호 링크(`CONTRIBUTING.md` §5) |
 | N11 | **SIM-M7 position 모드 `vel_ff` dead path** | owner 채택 결정 (sim `P4_FLAGS.md` 기존 항목) |
 | N14 | **standalone 노드의 non-sonar 기본값 drift** — `mapping_2d.intensity_threshold` 50 vs `mapping.yaml:11`의 10, `mapping_3d.map_3d_voxel_size` 0.2 vs `mapping.yaml:16`의 0.3 | 없음(P1-13과 동일한 성격의 기계적 정합). **Phase 3 `fix/map-and-metrics` 적대 검증(2026-09-01, agy)에서 새로 발견** — P1-13의 범위가 `sonar.*`라 그 PR에서 제외했다. `test_standalone_node_defaults.py`를 `mapping_2d.*`·`mapping_3d.*`까지 확장하면 같은 게이트로 잡힌다 |
+| N15 | **`_legacy` 로봇 정의의 mesh 자산 누락** — `data/robots/_legacy/girona500/girona500.scn` 16건, `_legacy/sonobot/sonobot.scn` 14건의 `<mesh filename=...>` 이 실재하지 않는다. 자산을 복원할지 `_legacy/` 를 통째로 은퇴시킬지 결정 | 없음(자산 보유 여부 확인이 선행). **Phase 3 `fix/scenario-and-guards` 적대 검증(2026-09-01, agy)에서 새로 발견** — 어떤 시나리오도 `_legacy` 를 include 하지 않아 현재 영향은 0이고(README 2곳의 서술이 유일한 참조), 그래서 그 PR의 `test_scenario_includes_resolve.py` 는 `<include file=...>` 만 보고 `<mesh filename=...>` 은 보지 않는다. 결정이 나면 같은 게이트를 mesh 까지 확장할 수 있다 |
+
 
 ### C. DR 재배선과 함께
 
