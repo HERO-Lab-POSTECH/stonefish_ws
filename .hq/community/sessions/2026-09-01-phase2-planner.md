@@ -102,6 +102,29 @@ codex와 agy에 **같은 프롬프트·같은 트리**로 동시 발주했고 �
 
 ### 다음 세션이 이어받을 것
 
-Phase 3 구현. 착수 전 확인: (1) PR #16·#24 머지 여부(D-A 전제), (2) `docs/p4-flags-refresh`
-두 브랜치의 push·PR 처리, (3) `~/.codeagent/models.json` 의 `explore`·`security`
-`yolo:false` 가 그대로인지(그대로면 그 두 role 은 여전히 파일을 못 읽는다 — D5).
+Phase 3 구현. **착수 전 확인 3건 중 2건은 2026-09-01 세션 후반에 해소됐다.**
+
+| # | 항목 | 상태 |
+|:--|:--|:--|
+| 1 | PR sim#24 · slam#16 머지 (D8 전제) | **미해소 — 유일한 차단 요인.** 둘 다 OPEN·MERGEABLE, base `main`. 사람이 GitHub 버튼으로 눌러야 한다(본인 PR 자기승인 금지) |
+| 2 | `docs/p4-flags-refresh` 두 브랜치 push·PR | **완료** — sim#25 · slam#17 |
+| 3 | `models.json` 의 `explore`·`security` yolo 플래그 | **완료** — 사용자가 직접 7개 role 전부 `yolo:true` 로 수정. ⚠️ codex 샌드박스 자체는 여전히 이 컨테이너에서 안 뜬다. `yolo:false` 인 role 을 새로 추가하면 같은 조용한 실패가 재발한다 |
+
+### push·PR 처리 기록 (2026-09-01)
+
+`docs/p4-flags-refresh` 두 브랜치는 `fix/build-warnings` 위에 쌓여 있었으나
+`git rebase --onto main fix/build-warnings` 로 **스택을 풀어 `main` 에 직접 올렸다.**
+근거: 파일 집합이 완전히 분리돼 있다 — 문서 브랜치는 `P4_FLAGS.md` 단독, 빌드 경고
+브랜치는 sim `stonefish_ros2/CMakeLists.txt` · slam `CMakeLists.txt`+`cpp/cfar.cpp`.
+따라서 문서 PR 은 #24·#16 머지를 기다릴 이유가 없고, D8 의 "선머지 후 main" 은
+**코드 브랜치에만** 걸린다.
+
+| repo | PR | 브랜치 |
+|:--|:--|:--|
+| meta `stonefish_ws` | [#11](https://github.com/HERO-Lab-POSTECH/stonefish_ws/pull/11) | `luckkim123/object_detection_to_2d_mapping` (Phase 1·2 거버넌스 기록 7커밋) |
+| `stonefish_sim` | [#25](https://github.com/HERO-Lab-POSTECH/stonefish_sim/pull/25) | `docs/p4-flags-refresh` → main |
+| `stonefish_slam` | [#17](https://github.com/HERO-Lab-POSTECH/stonefish_slam/pull/17) | `docs/p4-flags-refresh` → main |
+
+게이트 재측정(PR 증빙): sim **179 passed** · slam **71 passed** · `{"pass": true}`.
+⚠️ `evaluator.sh` 는 `OMX_PROJECT_DIR` 미설정 시 **`/workspace`(다른 체크아웃)** 를
+검사한다 — 워크트리를 재려면 반드시 지정해야 한다. 이번에 처음 드러난 함정이다.
