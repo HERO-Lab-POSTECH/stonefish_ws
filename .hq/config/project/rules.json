@@ -23,6 +23,12 @@
         "enforced": false
       },
       {
+        "path": "src/stonefish",
+        "role": "git repo HERO-Lab-POSTECH/stonefish (fork, 1.3.0 pinned) — core C++ physics/render library. stonefish_ros2 requires exact-version 1.3.0.",
+        "origin": "inductive",
+        "enforced": false
+      },
+      {
         "path": "src/stonefish_sim",
         "role": "git repo HERO-Lab-POSTECH/stonefish_sim — simulator-side ROS 2 packages (description, control, ros2 bridge).",
         "origin": "inductive",

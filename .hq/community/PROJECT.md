@@ -24,7 +24,7 @@ ROS 2 + colcon 워크스페이스. **수중 로봇 시뮬레이터 Stonefish** �
 
 - 소스 동기화: `vcs import src < stonefish.repos` (멀티-repo 가져오기)
 - 빌드: `colcon build` → `install/` 생성
-- ⚠️ `stonefish.repos`는 C++ 라이브러리 `stonefish` 자체도 나열하지만, 스캔 시점에 `src/`에 클론돼 있지 않았습니다(빌드된 `install/` 산출물만 존재). `vcs import` 미실행 상태일 수 있습니다.
+- `stonefish.repos`는 C++ 라이브러리 `stonefish` 자체도 나열합니다. 체크아웃에 따라 `src/stonefish` 클론이 없을 수 있는데(install 산출물만으로 빌드 가능), 2026-09-01 워크트리에서 `vcs import`로 실재가 확인돼 구조 규칙에 등재됐습니다.
 
 ## 메모
 

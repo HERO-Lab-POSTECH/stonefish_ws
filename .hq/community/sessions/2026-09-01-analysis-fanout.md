@@ -11,5 +11,7 @@ vendor CLI 부재(D1)로 codeagent-wrapper 대신 Claude Code Agent 도구로 �
 
 대상 코드: 워크트리 clone `src/stonefish_{sim,slam}` @ fix/build-warnings.
 베이스라인: slam 71 passed · sim 179 passed.
-핵심 결론은 검증(적대 verify) 후 posts/finding으로 승격 예정 — 이 파일은 워커
-호출 기록이 목적.
+이어서 Workflow `verify-findings`(run wf_892f0571-2bf)로 주장 37건을 발견별 적대
+검증 — 37/37 판정(CONFIRMED 29 · PARTIAL 8 · REFUTED 0), 에이전트 37(opus 8·
+sonnet 29), 3.83M 토큰·도구 600회. ground 4(적대 검증) 상당. 결과 정본은
+[[finding/008]] 포스트와 `.hq/work/project/audit-2026-09-01/`.
