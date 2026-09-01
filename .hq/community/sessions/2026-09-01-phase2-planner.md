@@ -67,3 +67,41 @@ ICP 점군에도 적용"을 **저비용**으로 권고했다. **세션이 이를
 | slam `utils/` `__all__` 부재 | 5개 파일 | **7개 전부** |
 | slam `localization.yaml` icp_config | `:29` | **`:30`** (줄 drift) |
 | sim `blueboat_sea.scn` 깨진 include | `:3` (finding/008) | **`:4`** (주석이 3행) |
+
+## 세션 종료 상태 (2026-09-01)
+
+**사용자 승인 완료.** D-A = PR #16·#24 선머지 후 `main`, D-B = `blueboat_sea.scn`
+**삭제**(교체 아님 — include 가 깨져 한 번도 launch 된 적이 없음), 제외 전건 승인
+**단 "지금 당장에만"** — 이번 사이클 완료 즉시 다음으로 진행. HUB D8·D9,
+`posts/decision/009`(N1~N13 정본 목록)로 못 박았다.
+
+### 커밋 (전부 미push)
+
+| repo | 브랜치 | 커밋 |
+|:--|:--|:--|
+| meta | `luckkim123/object_detection_to_2d_mapping` | `9fc9f7b` D4~D7 · `aee663c` finding/008 Comments · `14e796b` D8·D9 · (+ decision/009) |
+| sim | `docs/p4-flags-refresh` | `986d2fc` |
+| slam | `docs/p4-flags-refresh` | `8a2090d` |
+
+### 2-family 게이트 결과 — 겹치지 않았다
+
+codex와 agy에 **같은 프롬프트·같은 트리**로 동시 발주했고 둘 다 `REQUEST CHANGES`.
+겹친 지적은 2건(PR 분할 누락, CONFIRMED 조용한 탈락)뿐이고 나머지는 서로 달랐다:
+
+- **agy 단독**: P0-3의 단순 try/except가 factor 큐를 오염시켜 ISAM2를 **영구 무력화**한다
+  (`factor_graph.py:189-190`의 큐 비우기가 except 경로에서 건너뛰어짐). 가장 값나가는 지적.
+- **codex 단독**: P1-8 누수가 `profiling_data` 하나가 아니라 `performance_stats`까지 **둘**,
+  P0-4의 포화 서술 부정확, P1-10은 보수성 선택이 아니라 **동작 보존 정리**.
+- **둘 다**: P0-1의 평면 키 파싱은 아무것도 파싱 못 함(yaml 이 중첩 libpointmatcher 구조),
+  P1-2는 **결함이 아님**.
+
+세션이 리뷰 위에 추가로 발견한 것: P0-1에서 `TrimmedDistOutlierFilter.ratio: 0.8`을
+그대로 옮기면 **P4a 에서 이미 고친 버그가 되살아난다**(`pcl.py` 자체 주석이 순수 Python
+경로엔 1.0 이 옳다고 명시). 두 리뷰어 모두 "중첩 키를 매핑하라"고 했지만 그 중 하나는
+매핑하면 안 되는 키였다 — 벤더 출력을 결과가 아닌 초안으로 다룬 것이 값을 한 지점.
+
+### 다음 세션이 이어받을 것
+
+Phase 3 구현. 착수 전 확인: (1) PR #16·#24 머지 여부(D-A 전제), (2) `docs/p4-flags-refresh`
+두 브랜치의 push·PR 처리, (3) `~/.codeagent/models.json` 의 `explore`·`security`
+`yolo:false` 가 그대로인지(그대로면 그 두 role 은 여전히 파일을 못 읽는다 — D5).
