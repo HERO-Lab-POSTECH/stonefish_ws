@@ -34,6 +34,8 @@
 | D5 | 2026-09-01 | codex는 `yolo:true` role로만 라우팅한다 | 이 컨테이너에서 bubblewrap이 namespace를 못 만들어 샌드박스 경로의 codex는 파일을 하나도 못 읽으면서 에러 대신 "unavailable"만 답한다(조용한 실패). `explore`·`security`(yolo:false)는 사람이 `~/.codeagent/models.json`을 고쳐야 살아난다 | 낮음 — models.json 1줄 | Claude(세션, 실측) |
 | D6 | 2026-09-01 | 소나 틸트(config 30° vs 실물 80°) 코드 처방을 이번 사이클에서 **보류**하고 계측(I11)을 먼저 붙인다 | 적대 검증 LOC-3: 평탄 해저 무보정 ICP는 병진을 **과소** 추정하며 `cos(tilt)` 곱은 오차를 악화(30°: 0.89→0.77, 80°: 0.18→0.03). 문헌 조사의 "저비용 cos 보정" 권고를 세션이 기각 | 낮음 — 계측 결과가 나오면 그때 처방 | Claude(세션), 사용자 승인 대기 |
 | D7 | 2026-09-01 | god-method 분해(§4.4)와 SSM/NSSM 중복 통합(§4.2)을 이번 사이클에서 **제외** | 특성화 테스트 선작성이 그 자체로 한 사이클 분량이고, 버그 수정과 섞으면 회귀 원인 분리가 불가능 | 중 — 다음 사이클로 예약 | Claude(세션), 사용자 승인 대기 |
+| D8 | 2026-09-01 | Phase 2 계획 승인. 새 브랜치는 **PR #16·#24 선머지 후 `main`**, `blueboat_sea.scn`은 교체가 아니라 **삭제** | 두 PR은 몇 줄짜리 빌드 경고 수정이라 선머지가 리뷰 diff를 깨끗하게 한다. blueboat 시나리오는 include 가 깨져 **한 번도 launch 된 적이 없어** 삭제해도 잃는 동작이 없고, 어느 world 를 의도했는지 코드로 확정 불가한 상태의 추측 교체는 검증된 적 없는 씬을 새로 만들 뿐이다 | 낮음 | 사용자 |
+| D9 | 2026-09-01 | D6·D7을 포함한 **제외 항목 전건은 "지금 당장에만 제외"** — 이번 사이클 완료 즉시 다음 사이클로 진행한다 | 사용자 명시 조건부 승인. 조용한 탈락을 막기 위해 계획 §8에 N1~N13으로 예약하고, **§7.4 완료 판정에 "N1~N13 등재 확인"을 항목으로 넣었다** — 등재 없이 사이클을 닫으면 승인 조건 위반 | 없음 (약속) | 사용자 |
 
 Append only. Numbers are globally monotonic and never reused. An overturned decision
 gets a new row naming the one it supersedes; the original stays so the reasoning
