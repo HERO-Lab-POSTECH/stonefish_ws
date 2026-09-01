@@ -10,6 +10,7 @@ convention: **colcon-workspace** (`src/` 소스 + `install/` 빌드 산출물)
 |:---|:---|:---:|:---|
 | `src` | 소스 루트 — 손으로 쓴 코드 전부. vcstool이 git repo를 여기로 클론. **omp가 감사하는 유일한 트리** | ✅ | inductive (strong) |
 | `install` | colcon 빌드 산출물 트리 (~671MB, 재생성 가능, 소스 없음). 편집 금지·감사 제외 | ❌ | inductive (strong) |
+| `src/stonefish` | git repo `HERO-Lab-POSTECH/stonefish` (fork, 1.3.0 고정) — 코어 C++ 물리·렌더 라이브러리. `stonefish_ros2`가 exact-version 1.3.0 요구 | ❌ | inductive (2026-09-01, vcs import로 실재 확인) |
 | `src/stonefish_sim` | git repo `HERO-Lab-POSTECH/stonefish_sim` — 시뮬레이터 측 ROS 2 패키지 (description·control·ros2 브리지) | ❌ | inductive (strong) |
 | `src/stonefish_slam` | git repo `HERO-Lab-POSTECH/stonefish_slam` — SLAM 패키지 (Python core/nodes + C++ algos) | ❌ | inductive (strong) |
 | `src/stonefish_sim/stonefish_description/data` | 3D 에셋 전용 (mesh/texture/scene, ~621MB, 코드 0). dataset 후보 영역 | ❌ | preset |

@@ -6,4 +6,4 @@
 
 - **모델 디렉토리 케이스 혼재** (2026-06-23): `data/models/<name>/`가 kebab-case(`vasa-the-hold`)와 단어 단수(`caighouse`)가 섞임 (9/13). 규칙화하기엔 혼재가 심함. 팀이 한쪽으로 통일하기로 하면 승격 후보.
 - **`world_` 접두 서브패턴** (2026-06-23): `.scn` 31개 중 6개만 `world_` 접두 (6/31). 월드 씬에 `world_`를 의무화할지 결정되면 승격 후보.
-- **`stonefish` C++ 라이브러리 소스 부재** (2026-06-23): `stonefish.repos`에 등록됐으나 `src/`에 클론 없음(install 산출물만). `vcs import`로 채워지면 구조 규칙에 `src/stonefish` 항목 추가 필요 — codify 재실행 트리거.
+- ~~**`stonefish` C++ 라이브러리 소스 부재** (2026-06-23)~~ — **2026-09-01 해소**: `vcs import`로 `src/stonefish` 클론 확인(워크트리 object_detection_to_2d_mapping), `rules.json`·`STRUCTURE.md`에 항목 추가 완료. (`/workspace` 본 체크아웃은 여전히 미클론 — install 산출물만으로 빌드 가능하므로 체크아웃별 선택 사항.)
