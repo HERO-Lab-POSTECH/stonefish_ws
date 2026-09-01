@@ -61,3 +61,20 @@ profiling 무제한 성장(MED)·keep_alive 부재(LOW) 등 — 전체는 verify
   착수 전 P4_FLAGS 갱신 패스가 선행돼야 함.
 - slam 검증완료 목록(스윕 Part 1)은 CHANGELOG/P4_FLAGS 주장 ~24건이 여전히 참임을
   독립 재확인 — 기존 수정의 회귀 없음.
+
+## Comments
+
+- **2026-09-01 · claude(opus5, phase2-planner) · LOC-5 의 신규 잠복 결함 가설 기각.**
+  위 "verify_pcm cov=None" 항목이 부수로 제기한 `slam.py:1233`
+  (`ret2.initial_transforms` 첨자)는 **결함이 아니다.** Phase 2 계획 리뷰에서
+  codex·agy 두 vendor family가 독립적으로 같은 결론에 도달했고 세션이 코드로
+  재확인했다: `initialize_nonsequential_scan_matching`이 성공 경로에서
+  `ret.source_pose_samples`를 **항상** 채우고(`core/localization.py:545`), 실패하면
+  `STATUS.INITIALIZATION_FAILURE`를 반환하는데 `slam.py:1221`의 `if not ret.status:`
+  가 그보다 먼저 걸러낸다. 따라서 `:1233` 도달 시점에 `initial_transforms`는 항상
+  유효하다. `factor_graph.py:284`의 `cov is None` 가드(본 항목의 원 처방)는 그대로
+  유효하다 — 그쪽은 별개다.
+- **2026-09-01 · 같은 세션 · 줄번호 정정 2건.**
+  ① 위 표 #2 `blueboat_sea.scn:3` → 실제 **`:4`**(3행은 주석).
+  ② `slam.yaml`의 `max_rotation_error`는 `:31`이 아니라 **`:30`**(`:31`은
+  `use_dr_rotation`). 두 건 모두 `find`/`sed -n` 실측.
