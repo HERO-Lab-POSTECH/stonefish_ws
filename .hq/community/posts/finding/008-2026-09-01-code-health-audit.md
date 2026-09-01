@@ -4,7 +4,7 @@
 - to: all
 - subject: code-health-audit-2026-09 · supersedes: none
 - topic: decision
-- confidence: high · status: needs-apply
+- confidence: high · status: needs-experiment
 - verified: 2026-09-01 · keywords: slam, sim, localization, fft, icp, tilt, audit, bug
 - summary: 세 분석(slam 스윕·sim 스윕·localization 심층)의 버그 주장 37건을 발견별 독립 반박 시도로 검증 — 29 확정, 8 부분 성립, 0 반증. 최대 신규 사실: 시뮬 실제 소나 틸트 80° vs slam config 30° 불일치.
 
