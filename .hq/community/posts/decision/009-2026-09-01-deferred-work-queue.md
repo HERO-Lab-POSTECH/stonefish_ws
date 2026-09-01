@@ -39,6 +39,7 @@ HUB의 D9가 "제외는 즉시 후속 사이클로 예약"이라는 **약속**�
 | N9 | **`polar_to_cartesian` 남은 2벌 통합** — `localization_fft`(radial cos 투영) vs `mapping_2d`(x축만 스케일). 수학이 다르므로 통합은 어느 쪽이 옳은지 정해야 가능 | **N1** |
 | N10 | **SIM-M2 `INS.msg` `pose_variance`** 상시 0 — 채울지 없앨지 | 크로스 repo PR 상호 링크(`CONTRIBUTING.md` §5) |
 | N11 | **SIM-M7 position 모드 `vel_ff` dead path** | owner 채택 결정 (sim `P4_FLAGS.md` 기존 항목) |
+| N14 | **standalone 노드의 non-sonar 기본값 drift** — `mapping_2d.intensity_threshold` 50 vs `mapping.yaml:11`의 10, `mapping_3d.map_3d_voxel_size` 0.2 vs `mapping.yaml:16`의 0.3 | 없음(P1-13과 동일한 성격의 기계적 정합). **Phase 3 `fix/map-and-metrics` 적대 검증(2026-09-01, agy)에서 새로 발견** — P1-13의 범위가 `sonar.*`라 그 PR에서 제외했다. `test_standalone_node_defaults.py`를 `mapping_2d.*`·`mapping_3d.*`까지 확장하면 같은 게이트로 잡힌다 |
 
 ### C. DR 재배선과 함께
 
