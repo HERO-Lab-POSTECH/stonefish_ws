@@ -78,3 +78,23 @@ profiling 무제한 성장(MED)·keep_alive 부재(LOW) 등 — 전체는 verify
   ① 위 표 #2 `blueboat_sea.scn:3` → 실제 **`:4`**(3행은 주석).
   ② `slam.yaml`의 `max_rotation_error`는 `:31`이 아니라 **`:30`**(`:31`은
   `use_dr_rotation`). 두 건 모두 `find`/`sed -n` 실측.
+- **2026-09-01 · claude(opus5, phase2-planner) · `ema_fusion` 재확인 — 결론 유지, 이번엔 메커니즘을 명시한다.**
+  위 "ema_fusion 실버그 아님" 판정이 **두 번째로 재제기**됐다(독립 검증 에이전트가
+  `sweep-slam-report.md:129,162`의 "confirmed real bug"를 근거로 반증 주장). 재제기의 원인은
+  이 항목이 **결론만 적고 왜인지를 안 적었기** 때문이므로 여기 못 박는다. 결론은 불변이다 —
+  `count > 0`인데 `old_map == 0.0`인 셀은 만들 수 없다:
+  ① **필터가 엄격하다.** `mapping_2d.py:573`은 `mask = fan_sampled > self.intensity_threshold`로
+  `>=`가 아닌 **strict `>`**다. 따라서 `:616`의 `intensities`는 전부 threshold 초과이고,
+  `:649`의 정규화 `(raw - threshold)/(255 - threshold)*255`는 **엄격히 양수**이며
+  `:650`의 `np.clip(..., 0, 255)`가 그것을 보존한다. `map_flat`에 0.0이 쓰이는 경로가 없다.
+  ② **count와 map이 인덱스 집합을 공유한다.** `:693`의 `map_flat[linear_indices] = ...`와
+  `:694`의 `np.add.at(count_flat, linear_indices, 1)`이 **같은 `linear_indices`**를 쓴다.
+  "관측은 됐는데 누적 강도가 0.0인 셀"은 전강도-0 관측이 count를 올려야 성립하는데,
+  그런 관측은 `:573`에서 걸러져 `linear_indices`에 애초에 들어오지 않는다 — 아무것도 올리지 않는다.
+  두 배열은 `:464-465`에서 함께 `np.zeros`로 나고 `:834`/`:839`에서 함께 0으로 패딩되며,
+  블렌드(`alpha*new + (1-alpha)*old`, 양항 모두 ≥0, old>0)는 양수를 0으로 되돌리지 못한다.
+  따라서 `count > 0 ⟺ old_map > 0.0`이 정확히 성립하고 마스크는 `observation_count`와
+  전 구간 일치한다. **처방은 그대로 `observation_count` 시그니처 제거(dead parameter)뿐이다.**
+  ⚠️ **파이프라인 순서 주의**: `sweep-slam-report.md`는 검증 **이전**의 원 주장 소스이고
+  이 finding이 그것을 강등한 **적대 검증 결과**다. 둘이 어긋나면 후자가 나중 증거이며,
+  뒤집으려면 위 strict `>` 필터를 통과하는 경로를 제시해야 한다 — 스윕 문장 재인용은 근거가 아니다.
