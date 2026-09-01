@@ -62,7 +62,7 @@ ICP 점군에도 적용"을 **저비용**으로 권고했다. **세션이 이를
 | sim `lipb_interpolator.init_interpolator` | 152줄 god-method | **26줄** — 분해 완료, 종결 |
 | sim `los_guidance.py::update` | 177줄 god-method | **파일 자체가 없음** — 유령 항목 |
 | sim `path_following_node.__init__` | 170줄 | **199줄** — 열림, **악화** |
-| sim VelocityProfiler dead 분기 | cs 14 · lipb 15 | cs **7** · lipb **7** · `trajectory_generator` **6**(목록에 없던 파일) |
+| sim VelocityProfiler dead 분기 | cs 14 · lipb 15 | **cs 14 · lipb 14 · `common/trajectory_generator` 6** (참조 줄 수 기준). 첫 갱신에서 세션이 "cs 7 · lipb 7"로 적었으나 **어떤 계수 규칙으로도 재현 안 됨** — 독립 검증(2026-09-01)이 잡아내 정정했다. 원 기록의 "14"가 오히려 맞았고 진짜 누락은 `trajectory_generator` 6줄 |
 | sim velocity/unified controller node, teleop_manager | 백로그 항목 | **삭제됨** — 3항목 종결 |
 | slam `utils/` `__all__` 부재 | 5개 파일 | **7개 전부** |
 | slam `localization.yaml` icp_config | `:29` | **`:30`** (줄 drift) |
@@ -109,6 +109,31 @@ Phase 3 구현. **착수 전 확인 3건 중 2건은 2026-09-01 세션 후반에
 | 1 | PR sim#24 · slam#16 머지 (D8 전제) | **미해소 — 유일한 차단 요인.** 둘 다 OPEN·MERGEABLE, base `main`. 사람이 GitHub 버튼으로 눌러야 한다(본인 PR 자기승인 금지) |
 | 2 | `docs/p4-flags-refresh` 두 브랜치 push·PR | **완료** — sim#25 · slam#17 |
 | 3 | `models.json` 의 `explore`·`security` yolo 플래그 | **완료** — 사용자가 직접 7개 role 전부 `yolo:true` 로 수정. ⚠️ codex 샌드박스 자체는 여전히 이 컨테이너에서 안 뜬다. `yolo:false` 인 role 을 새로 추가하면 같은 조용한 실패가 재발한다 |
+
+### 머지·검증 기록 (2026-09-01 오후)
+
+**sim#24 · slam#16 머지 완료** (사용자 명시 승인). 저자와 별개 패스로 검증한 뒤 머지했다 —
+클린 빌드(`--cmake-clean-first`) 비교로 `main` 8건 → `fix/build-warnings` **0건**,
+양쪽 exit=0. 머지 커밋 sim `3b237ae` · slam `ef8529d`. **D8 전제 해소 — Phase 3 착수 가능.**
+
+⚠️ **경고 계수 함정**: `grep -ciE "warning:"`(콜론 포함)은 CMake/PCL이 내는
+`** WARNING ** io features related to pcap will be disabled`를 **놓친다**. 콜론 없는 형식이라
+sim#24가 표방한 바로 그 경고가 집계에서 빠졌고, 하마터면 "PR이 표방한 걸 안 한다"고
+오판할 뻔했다. 경고 비교는 콜론 없는 형식까지 포함해 세야 한다.
+
+⚠️ **`add_link_options`(slam CMakeLists)는 CMake 3.13+ 명령인데 `cmake_minimum_required`는
+3.8을 선언한다.** 설치본이 3.22라 지금은 동작하지만 선언과 실요구가 어긋나 있다 — 별건 이월.
+
+**세션 자신의 P4_FLAGS 정정에서 오류 1건 발견.** 문서 PR 2건은 이 세션이 작성했으므로
+자기승인을 피해 수치 주장 11건을 독립 검증(OMC verifier, sonnet)에 걸었다. 10건 CONFIRMED,
+**1건 반증** — `cs 7곳 · lipb 7곳`이 어떤 계수 규칙으로도 재현되지 않았다(if 문 5·5·3,
+중첩 포함 6·6·3). 실측은 참조 줄 수 기준 **14 · 14 · 6**이며, 이 PR이 "부정확하다"고
+지적한 원 기록의 "14"가 오히려 맞았다. 정정 커밋 sim `d44f2f0`에 **계수 규칙을 명시**했다.
+교훈: 규칙 없는 숫자는 앞 기록을 정정한다면서 더 나쁜 기록을 만든다.
+
+**codex 백엔드 사용량 한도 소진**(2026-09-01, 재개 예정 20:10). 이 세션의 잔여 작업은
+codex를 쓰지 않으므로 영향 없으나, **ground 4 의 2-family 게이트를 다시 열려면 agy 단독이거나
+한도 해제 후여야 한다.** 한 family 만으로 여는 것은 게이트가 아니다.
 
 ### push·PR 처리 기록 (2026-09-01)
 
