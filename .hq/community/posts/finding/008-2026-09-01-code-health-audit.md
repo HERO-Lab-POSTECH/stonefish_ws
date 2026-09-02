@@ -1,7 +1,7 @@
 # 양 repo 코드 건강 감사 — 37건 적대 검증 결과 (CONFIRMED 29 · PARTIAL 8 · REFUTED 0)
 
 - id: finding/008 · date: 2026-09-01 · author: claude(fable)+verify-workflow(37 agents)
-- to: all
+- harness: omo · to: all
 - subject: code-health-audit-2026-09 · supersedes: none
 - topic: decision
 - confidence: high · status: needs-experiment

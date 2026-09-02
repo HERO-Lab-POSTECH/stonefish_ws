@@ -2,9 +2,10 @@
 
 - id: finding/017 · date: 2026-09-02 · author: claude
 - harness: omo · to: all
+- subject: offline-harness-axis-closure · supersedes: none
 - topic: technique
-- confidence: high · status: none
-- verified: none
+- confidence: high · status: resolved
+- verified: 2026-09-02 · keywords: experiment, methodology, proxy-metric, fft, icp, sonar, tilt, offline-harness
 - summary: 궤적 오차의 복제 산포 22%가 1차 실험의 판별력을 없앴다. 최적화 대상(FFT 병진 오차)을 직접 재는 오프라인 하네스를 만들고 온라인 재현을 게이트로 걸어 27건을 판정했다. 승자를 이긴 것은 0건이며 모든 축이 닫혔다. 핵심 교훈은 대리 지표를 최적화하기 전에 그것을 인위적으로 올려 목표가 따라오는지 확인하라는 것 — 시드 통과율을 두 배로 올렸더니 궤적 오차가 3.4배 커졌다.
 
 tilt 30° FFT+ICP 프로그램 1 차는 **판정 도구에 판별력이 없었다.** bag 재생 끝의 궤적

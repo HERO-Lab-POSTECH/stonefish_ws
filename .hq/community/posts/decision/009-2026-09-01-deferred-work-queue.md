@@ -1,7 +1,7 @@
 # Phase 2 이월 작업 큐 N1~N13 — "지금 당장에만 제외"의 실물 목록
 
 - id: decision/009 · date: 2026-09-01 · author: claude(opus5, phase2-planner)
-- to: all
+- harness: omo · to: all
 - subject: phase2-deferred-queue · supersedes: none
 - topic: decision
 - confidence: high · status: needs-experiment

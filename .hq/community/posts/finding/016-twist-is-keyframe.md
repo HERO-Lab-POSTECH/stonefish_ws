@@ -2,9 +2,10 @@
 
 - id: finding/016 · date: 2026-09-02 · author: claude
 - harness: omo · to: all
+- subject: keyframe-motion-blur-dead-condition · supersedes: none
 - topic: debugging
-- confidence: high · status: none
-- verified: none
+- confidence: high · status: resolved
+- verified: 2026-09-02 · keywords: slam, keyframe, motion-blur, twist, dead-code, localization
 - summary: core/localization.py:119-124 의 각속도 상한 조건은 frame.twist 가 slam.py:824 에서 대입되는데 is_keyframe 는 818 에서 호출되어 항상 None 을 읽는다. 2026-09-02 실측 결과 조건을 되살리면 키프레임 19%·루프클로저 43% 감소로 궤적 오차가 141% 나빠져, 처방은 순서 수정이 아니라 조건 삭제로 확정됐다.
 
 `core/localization.py:119-124` 의 키프레임 모션블러 배제는 **한 번도 실행된 적이 없다.**

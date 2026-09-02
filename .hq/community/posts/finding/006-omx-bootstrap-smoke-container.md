@@ -1,7 +1,7 @@
 # omx bootstrap smoke (container)
 
 - id: finding/006 · date: 2026-07-23 · author: wiki-form-conversion
-- to: all
+- harness: omx · to: all
 - subject: omx-bootstrap-smoke · supersedes: none
 - topic: environment
 - confidence: high · status: none
