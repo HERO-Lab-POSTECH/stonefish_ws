@@ -1,6 +1,6 @@
 # INDEX — stonefish_ws
 
-> 17 posts · regenerated 2026-09-02 by `hq index`
+> 18 posts · regenerated 2026-09-02 by `hq index`
 
 ## decision
 - `decision/002` [subject: naming-rules-codify] codify 2026-06-23 — 글롭 수정·약어 예외·specificity 재계산 — codify 2026-06-23 — 글롭 수정·약어 예외·specificity 재계산
@@ -21,6 +21,7 @@
 - `finding/015` [subject: experiment-hygiene-traps] 실험 신뢰도를 깬 것은 알고리즘이 아니라 요약 지표와 런 환경이었다 — tilt30 세션에서 잘못된 결론을 세 번 세웠다가 철회했고 원인이 전부 같았다 — 요약 지표가 조용히 잘라낸 부분이 결론을 뒤집는 부분. 재발 방지 7가지: 런 전 잔여 프로세스 확인(tf publisher 3종이 매 런 샌다), pairs 는 SLAM 사망을 못 본다, 복제 산포는 첫 실험 전에 잴 것(실측 22%), 시뮬에서 오차가 좋아지면 계측 사망을 의심, 반칙 지표는 분모와 함께 읽기, pkill -f 자기 셸 사망, nohup 백그라운드 런이 다음 런을 죽인다.
 - `finding/016` [subject: keyframe-motion-blur-dead-condition] 키프레임 모션블러 배제가 한 번도 실행되지 않는다 (twist 대입이 is_keyframe 호출보다 뒤) — core/localization.py:119-124 의 각속도 상한 조건은 frame.twist 가 slam.py:824 에서 대입되는데 is_keyframe 는 818 에서 호출되어 항상 None 을 읽는다. 2026-09-02 실측 결과 조건을 되살리면 키프레임 19%·루프클로저 43% 감소로 궤적 오차가 141% 나빠져, 처방은 순서 수정이 아니라 조건 삭제로 확정됐다.
 - `finding/017` [subject: offline-harness-axis-closure] 오프라인 하네스로 축을 닫기 — tilt 30° FFT+ICP 2차 실험 27건 총괄 — 궤적 오차의 복제 산포 22%가 1차 실험의 판별력을 없앴다. 최적화 대상(FFT 병진 오차)을 직접 재는 오프라인 하네스를 만들고 온라인 재현을 게이트로 걸어 27건을 판정했다. 승자를 이긴 것은 0건이며 모든 축이 닫혔다. 핵심 교훈은 대리 지표를 최적화하기 전에 그것을 인위적으로 올려 목표가 따라오는지 확인하라는 것 — 시드 통과율을 두 배로 올렸더니 궤적 오차가 3.4배 커졌다.
+- `finding/018` [subject: sonar-sampling-vs-rotation-bottleneck] 센서 표본화는 병목이 아니다 — tilt 30° FFT 병진 오차의 절반은 회전 추정에서 온다 — 사용자가 소나 range 수정 가능을 알려와, 시뮬 재녹화 없이 캐시된 188쌍을 성기게 만들어 20분에 답했다. 거리·방위·고도 세 표본화 축이 전부 평평하다(방위는 4배 성겨도 오히려 개선, 고도 정확 보정은 손해). 거리축 적합의 분해능 무관 바닥 0.357 m 가 현재 오차 0.366 m 의 97% 라 range_max 40→15 나 bins·beams 두 배는 2~3% 밖에 못 산다. 진짜 병목은 회전 — GT 회전을 주입하면 병진 오차 0.366→0.183 m, 게이트 통과 34.0→71.3% 다. 회전오차 중앙 2.08° 가 10 m 에서 만드는 접선 변위 0.36 m 가 그 바닥과 같은 것이다. B5 극좌표 직접 상관은 참패(1.05 m)로 닫혔고 D6 의 '86행' 서술도 178/500 으로 정정한다.
 
 ## review
 - `review/005` [subject: git-compliance-review] git 규칙 준수 검토 (2026-07-23, 배포 준비 세션) — git 규칙 준수 검토 (2026-07-23, 배포 준비 세션)
