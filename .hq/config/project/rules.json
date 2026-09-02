@@ -4,9 +4,9 @@
     "name": "stonefish-ws",
     "preset_origin": "research-lab",
     "initialized": "2026-06-23",
-    "last_codified": "2026-08-10"
+    "last_codified": "2026-09-02"
   },
-  "specificity": 0.941,
+  "specificity": 0.944,
   "structure": {
     "convention": "colcon-workspace",
     "directories": [
@@ -80,6 +80,30 @@
         "path": "experiments",
         "role": "omx run output tree (SSOT, data; schema in .hq/config/experiments/profile/tree.yaml). Not in git; excluded from audit.",
         "origin": "omx init (2026-07-23)",
+        "enforced": false
+      },
+      {
+        "path": "data",
+        "role": "external-asset root — bags, trained weights, orphaned run outputs. Machine-local, not in git, excluded from audit. The axis vs experiments is KIND not provenance: experiments/ = omx run outputs conforming to tree.yaml; data/ = bulk assets that schema does not cover.",
+        "origin": "2026-09-02 mac->container asset migration",
+        "enforced": false
+      },
+      {
+        "path": "data/bags",
+        "role": "rosbag SSOT — simulator recordings and received sea-trial bags in ONE place. The former experiments/bags/ was a squatter: tree.yaml has no 'bags' level, so omx walk mistook it for a run dir (run_dir.requires manifest.json). Migrated 2026-09-02.",
+        "origin": "codify-2026-09-02",
+        "enforced": false
+      },
+      {
+        "path": "data/models",
+        "role": "trained weights (.pt) — binaries never committed. stonefish_sonar_yolo takes an absolute path via -p model:=<path>.",
+        "origin": "codify-2026-09-02",
+        "enforced": false
+      },
+      {
+        "path": "data/wandb_optimizer_runs",
+        "role": "ORPHAN asset — 72 wandb runs from the 2025-11 PID optimizer. Producing package stonefish_control_utils was deleted and the mac original discarded, so this is the only copy; kept for reference. Gains predate the P5 cascade redesign and are NOT current.",
+        "origin": "preserved 2026-09-02",
         "enforced": false
       }
     ]
@@ -162,13 +186,15 @@
     ".omc/**",
     ".hq/**",
     "experiments/**",
-    ".sp/**"
+    ".sp/**",
+    "data/**"
   ],
   "learned_refs": [
     "codify-2026-06-23: specificity recomputed per learning-protocol.md §4 over current rule items (structure 8 + naming 9 = 17, inductive 16 + preset 1 -> 16/17); optimizer/output structure+ignore rules already removed from disk (stonefish_control_utils package deleted), so denominator shrank vs init",
     "codify-2026-06-23: naming cpp_ros2 applies_to fixed (src/stonefish_ros2/{src,include}/* -> src/**/stonefish_ros2/{src,include}/**/ROS2*.{cpp,h}); real package one level deeper at src/stonefish_sim/stonefish_ros2/, ROS2* files in inner stonefish_ros2/ subdir — now matches 10, excludes 2 entrypoints",
     "codify-2026-06-23: naming config yaml regex extended to allow all-uppercase acronyms (TAM.yaml = Thruster Allocation Matrix); PascalCase still flagged",
     "organize-2026-08-10: albc_bridge -> stonefish_albc_bridge renamed (sim repo cefb904); it was the sole src/*/ violator of the stonefish_ prefix, added after the 2026-06-23 codify so it never passed a rule check. Recount by package.xml enumeration: 9/9 compliant. ROS node name kept as 'albc_bridge' -- sibling packages use bare function names for node names (thruster_allocator, path_generator_node), so the package-prefix rule does not apply to the runtime node axis.",
-    "codify-2026-08-22: naming package-dir regex extended with explicit exception nav_interfaces (sim repo feat/mjkim-integration adds it for KMU/LIG sea-trial bag decoding; bag-recorded msg type names pin the package name, so the stonefish_ prefix cannot apply). The other package from the same integration was renamed instead (sonar_yolo_ros2 -> stonefish_sonar_yolo, albc precedent)."
+    "codify-2026-08-22: naming package-dir regex extended with explicit exception nav_interfaces (sim repo feat/mjkim-integration adds it for KMU/LIG sea-trial bag decoding; bag-recorded msg type names pin the package name, so the stonefish_ prefix cannot apply). The other package from the same integration was renamed instead (sonar_yolo_ros2 -> stonefish_sonar_yolo, albc precedent).",
+    "codify-2026-09-02: data/ added as a top-level external-asset root (mac->container migration: 4.5GB sea-trial bag, 51MB YOLO weights, 20MB orphaned wandb runs). Also retired experiments/bags/ — tree.yaml declares no 'bags' level, so omx walk treated it as a run dir failing run_dir.requires [manifest.json]; the 2.5GB sim bag was moved to data/bags/ (copy -> sha256 diff over 5 files -> gio trash) and CLAUDE.md record/play paths updated in the same pass. wandb_optimizer_runs kept, not deleted: producing package stonefish_control_utils is gone and the mac original was discarded, making this the only copy. specificity denominator follows the codify-2026-06-23 convention — only origin inductive|preset counts; harness-provisioned entries (omx init, omp-env) and these codify-dated data/ roots are excluded, so adding data/ leaves it at 0.944 (17/18)."
   ]
 }

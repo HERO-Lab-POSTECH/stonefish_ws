@@ -90,21 +90,27 @@ ros2 launch stonefish_slam slam.launch.py vehicle_name:=bluerov2   # 터미널 C
 
 ### rosbag 재생으로 SLAM 검증 (시뮬 반복 실행 대신)
 
-SLAM 쪽 변경은 매번 시뮬을 띄우지 말고 **한 번 녹화한 bag을 재생**해 검증합니다. bag은
-`experiments/` 트리(gitignore, 머신 로컬)에 두며, 이 머신에는
-`experiments/bags/2026-09-02-bluerov2-lawnmower-tilt10/`(lawnmower 424 s · 680 MiB · FLS
-7,380 프레임 · odometry/imu/dvl/pressure/altitude/INS/tf, 시뮬 FLS 하향 10° 시점)가 있습니다.
+SLAM 쪽 변경은 매번 시뮬을 띄우지 말고 **한 번 녹화한 bag을 재생**해 검증합니다. bag 정본은
+`data/bags/`(gitignore, 머신 로컬)이며 시뮬 녹화·실해역 수령을 한 곳에 둡니다 —
+`experiments/`는 omx 런 출력 전용이라 `tree.yaml` 스키마에 `bags`가 없고, 거기 두면 omx walk가
+런 디렉터리로 오인합니다(2026-09-02 이관). 이 머신에는 둘이 있습니다:
+
+| bag | 내용 |
+|:--|:--|
+| `data/bags/2026-09-02-bluerov2-lawnmower-tilt10/` | 시뮬 녹화. lawnmower 424 s · FLS 7,380 프레임 · odometry/imu/dvl/pressure/altitude/INS/tf, 시뮬 FLS 하향 10° 시점 |
+| `data/bags/2026-09-02-bluerov2-lawnmower-tilt30/` | 시뮬 녹화(sim PR #28 상태, FLS 하향 30°). 같은 lawnmower · 2.0 GB. SLAM 궤적이 발산하는 런이라 **틸트 A/B 비교용**이지 회귀 기준선이 아님 |
+| `data/bags/gucki_merge/통합_world_ned/` | 실해역 수령(맥 이관). 510 s · 20,391 msg · `/knu/enhancement/keyframe/compressed` 등, 이미 `world_ned` 정렬. 재생 설정은 형제 `통합.rviz` |
 
 ```bash
 # 녹화 — 시뮬(A)·경로추종(B)을 띄운 뒤. 소나 원본이 ~4.5 MB/s 라 zstd 파일 압축 권장.
 # ⚠️ `-d` 는 총 녹화 시간이 아니라 파일 분할 주기 — 스스로 멈추지 않으니 Ctrl-C 로 끝냅니다.
-ros2 bag record -o experiments/bags/<날짜>-<시나리오> --compression-mode file --compression-format zstd \
+ros2 bag record -o data/bags/<날짜>-<시나리오> --compression-mode file --compression-format zstd \
   /bluerov2/fls/image /bluerov2/odometry /bluerov2/imu /bluerov2/dvl /bluerov2/pressure \
   /bluerov2/altitude /bluerov2/INS /bluerov2/control_mode /bluerov2/cmd_pose /tf /tf_static
 
 # 재생 — bag 이 /clock 을 내므로 이때만 use_sim_time:=true (라이브 시뮬은 /clock 이 없어 false 유지)
 ros2 launch stonefish_slam slam.launch.py vehicle_name:=bluerov2 use_sim_time:=true rviz:=false
-ros2 bag play experiments/bags/2026-09-02-bluerov2-lawnmower-tilt10 --clock
+ros2 bag play data/bags/2026-09-02-bluerov2-lawnmower-tilt10 --clock
 ```
 
 판정은 slam 로그의 `[INSTR] counters` 줄(`icp_attempted`·`icp_converged`·`seed_fft` 등)로
