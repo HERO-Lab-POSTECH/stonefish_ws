@@ -88,6 +88,29 @@ ros2 launch stonefish_slam slam.launch.py vehicle_name:=bluerov2   # 터미널 C
 띄울 수 없고, 그런 환경에서 가능한 검증은 pytest fast gate까지입니다. 닫힌루프 궤적 오차
 측정은 팀 GPU 머신에서 `src/stonefish_slam/docs/RUN_TEST.md` 절차로 수행합니다.
 
+### rosbag 재생으로 SLAM 검증 (시뮬 반복 실행 대신)
+
+SLAM 쪽 변경은 매번 시뮬을 띄우지 말고 **한 번 녹화한 bag을 재생**해 검증합니다. bag은
+`experiments/` 트리(gitignore, 머신 로컬)에 두며, 이 머신에는
+`experiments/bags/2026-09-02-bluerov2-lawnmower-tilt10/`(lawnmower 424 s · 680 MiB · FLS
+7,380 프레임 · odometry/imu/dvl/pressure/altitude/INS/tf, 시뮬 FLS 하향 10° 시점)가 있습니다.
+
+```bash
+# 녹화 — 시뮬(A)·경로추종(B)을 띄운 뒤. 소나 원본이 ~4.5 MB/s 라 zstd 파일 압축 권장.
+# ⚠️ `-d` 는 총 녹화 시간이 아니라 파일 분할 주기 — 스스로 멈추지 않으니 Ctrl-C 로 끝냅니다.
+ros2 bag record -o experiments/bags/<날짜>-<시나리오> --compression-mode file --compression-format zstd \
+  /bluerov2/fls/image /bluerov2/odometry /bluerov2/imu /bluerov2/dvl /bluerov2/pressure \
+  /bluerov2/altitude /bluerov2/INS /bluerov2/control_mode /bluerov2/cmd_pose /tf /tf_static
+
+# 재생 — bag 이 /clock 을 내므로 이때만 use_sim_time:=true (라이브 시뮬은 /clock 이 없어 false 유지)
+ros2 launch stonefish_slam slam.launch.py vehicle_name:=bluerov2 use_sim_time:=true rviz:=false
+ros2 bag play experiments/bags/2026-09-02-bluerov2-lawnmower-tilt10 --clock
+```
+
+판정은 slam 로그의 `[INSTR] counters` 줄(`icp_attempted`·`icp_converged`·`seed_fft` 등)로
+합니다. 시뮬 odometry는 무노이즈 ground truth라 ICP를 켜면 `2D err`가 0에서 ~1 m로 **커지는
+것이 정상**이며, 그 값은 회귀 지표가 아니라 틸트·설정 A/B 비교의 기준선입니다.
+
 ### 거버넌스 도구
 
 `.hq/` 한 스토어를 oh-my-project(`config/project/` — 구조·명명 규칙 SSOT)와

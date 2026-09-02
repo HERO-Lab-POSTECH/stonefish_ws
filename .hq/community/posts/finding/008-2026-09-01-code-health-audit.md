@@ -6,8 +6,7 @@
 - topic: decision
 - confidence: high · status: needs-experiment
 - verified: 2026-09-01 · keywords: slam, sim, localization, fft, icp, tilt, audit, bug
-- summary: 세 분석(slam 스윕·sim 스윕·localization 심층)의 버그 주장 37건을 발견별 독립 반박 시도로 검증 — 29 확정, 8 부분 성립, 0 반증. 최대 신규 사실: 시뮬 실제 소나 틸트 80° vs slam config 30° 불일치.
-
+- summary: 세 분석(slam 스윕·sim 스윕·localization 심층)의 버그 주장 37건을 발견별 독립 반박 시도로 검증 — 29 확정, 8 부분 성립, 0 반증. 최대 신규 사실: 시뮬 실제 소나 틸트는 수평면 아래 10°(roll 80°를 하향각으로 오독) vs slam config 30° 불일치(2026-09-02 정정).
 ## 방법
 
 워크트리 clone(`src/stonefish_{sim,slam}` @ fix/build-warnings) 대상.
@@ -39,11 +38,22 @@ profiling 무제한 성장(MED)·keep_alive 부재(LOW) 등 — 전체는 verify
 
 ## 검증이 뒤집은 것 (PARTIAL 교정)
 
-- **틸트 기하(최대 수확)**: 시뮬 실물은 FLS **80° 하향**(bluerov2.scn:276-279)인데
-  slam config는 전부 30° — 어떤 모듈의 cos 보정도 실 기하와 무관하게 돌아간다.
-  평탄 해저에서 무보정 ICP는 병진 **과소** 추정(80°에서 1m→0.18m)이고, 제안됐던
-  cos(tilt) 곱 보정은 오히려 악화시킨다. 물리적으로 옳은 처리는 mapping_3d의 완전
-  3D 변환뿐. 실계수는 GPU 머신 직선 주행 실측으로 확정할 것.
+- **틸트 기하(최대 수확)** — ⚠️ **2026-09-02 정정: 시뮬 실물은 80°가 아니라 수평면
+  아래 10°다.** 원문이 `bluerov2.scn:278`의 `rpy="1.39626 0.0 1.571"` 에서 roll 80°를
+  하향각으로 읽었는데, Stonefish는 `<origin rpy>`를 Rz(yaw)·Ry(pitch)·Rx(roll)로
+  합성하고(`ScenarioParser.cpp:4211`, `BT_EULER_DEFAULT_ZYX`) 카메라형 센서의 시선을
+  센서 +Z로 잡으므로(`Camera.cpp:76`) roll은 **연직 기준**이다 — roll 0 = 바로 아래,
+  roll 90 = 수평 정면. 하향각 = 90° − roll = **10°**. slam의 `sonar_tilt_deg`는
+  반대로 **수평면 기준**(모든 소비자가 수평거리 = 거리 × cos(tilt))이라 두 값은 같은
+  기준면이 아니다. 따라서 불일치는 "시뮬 80° vs config 30°"가 아니라 **시뮬 10° vs
+  config 30°**이고, 방향도 반대다: config가 cos30=0.866을 곱하는데 실제는 cos10=0.985
+  라 slam이 수평거리를 약 12% **과소** 추정한다(원문의 "80°에서 1m→0.18m"는 잘못된
+  80°에서 유도된 수치). 원인은 sim `54636c6`("pitch 60°→80° 하향")이 roll을 틸트로
+  오독해 실제 하향각을 30°→10°로 **줄인** 것 — 직전 roll 60°(=30° 하향)은 sonar.yaml과
+  정확히 맞아 있었다. 회귀 가드 `test_sonar_tilt_matches_sim_scenario.py`(slam
+  `fix/localization-config-restore`)가 이제 회전 전체에서 하향각을 계산해 두 repo를
+  비교한다. 어느 쪽을 정본으로 할지(A2)는 사용자 결정 대기. 원문의 나머지 결론
+  (물리적으로 옳은 처리는 mapping_3d의 완전 3D 변환뿐)은 유지.
 - **ty 부호 오류 가설 기각**: 주석(:960 "Left")만 stale — 값은 starboard-positive로
   자기정합. 17% 선회 집중 기각의 새 최우선 가설 = use_dr_rotation 잔여 회전 오차의
   lever-arm 병진 편향 (측정 레시피는 verify-results.json LOC-8).
@@ -98,3 +108,5 @@ profiling 무제한 성장(MED)·keep_alive 부재(LOW) 등 — 전체는 verify
   ⚠️ **파이프라인 순서 주의**: `sweep-slam-report.md`는 검증 **이전**의 원 주장 소스이고
   이 finding이 그것을 강등한 **적대 검증 결과**다. 둘이 어긋나면 후자가 나중 증거이며,
   뒤집으려면 위 strict `>` 필터를 통과하는 경로를 제시해야 한다 — 스윕 문장 재인용은 근거가 아니다.
+
+- (2026-09-02, claude-fable) 정정: 시뮬 소나 틸트는 80°가 아니라 수평면 아래 10°(roll 80°는 연직 기준). 본문 틸트 항목과 summary 를 함께 정정
