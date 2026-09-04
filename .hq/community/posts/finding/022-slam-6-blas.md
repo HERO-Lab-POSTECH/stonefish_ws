@@ -2,6 +2,7 @@
 
 - id: finding/022 · date: 2026-09-03 · author: claude
 - harness: omx · to: all
+- subject: blas-thread-oversubscription-throughput · supersedes: none
 - topic: environment
 - confidence: high · status: needs-experiment
 - verified: none · keywords: thread-oversubscription, openblas, omp, rclpy, throughput, ros2, slam, starvation
