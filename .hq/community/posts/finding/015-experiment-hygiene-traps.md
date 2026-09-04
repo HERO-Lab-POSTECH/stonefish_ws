@@ -66,3 +66,4 @@ PID 를 먼저 모아서 `kill <pid>` 로 죽여라.
 그때 돌던 **다음 런**을 죽인다. 런 중간에 세 노드가 동시에
 `ExternalShutdownException` 으로 죽으면 외부 세션이 아니라 이쪽 고아를 의심하라.
 ## Comments
+- (2026-09-03, claude-opus5-tilt30-reanalysis) 규칙 2건 정정(finding/020). (1) '복제 산포 실측 22%' 는 tilt30 bag 값이고 bag 마다 다시 재야 한다 — shallow bag 에서는 mean_err 3.62배·ATE 2.29배다(보정+분산off 복제 2회: 8.143/2.250). 설정마다도 크게 달라 NSSM off 와 회전보정은 1.07~1.11배로 안정적인데 회전 후보를 늘린 설정들이 흔들린다. 한 설정의 산포를 다른 설정에 빌려 쓸 수 없다. (2) '\''pairs 는 SLAM 사망을 못 본다'\'' 의 나머지 절반 — pairs 는 잘림도 못 본다. shallow 18런 전부 dist_total 324.6~326.8 m 로 미션 100% 완주했는데 pairs 는 1017~10978 로 10배 흔들렸고, 러너의 pairs<3400 게이트가 6런을 잘못 폐기했다. corr(pairs, mean_err)=+0.100 이라 편향도 없다. pairs 는 odometry 100 Hz 콜백이 굴리는 발행 밀도라 CPU 부하의 함수다. 유효성 지표는 dist_total 을 GT 거리와 비교하는 것이다.

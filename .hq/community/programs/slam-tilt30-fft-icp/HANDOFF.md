@@ -1,3 +1,7 @@
+> ⚠️ **이 문서 앞부분은 2026-09-02 상태다.** 현재 상태는 맨 아래
+> **「인계 2026-09-04 — 사이클 종료」** 절이다. 제약 조건(브리프 원문)만 아래에서 읽고,
+> 나머지는 최신 절을 따를 것.
+
 # slam-tilt30-fft-icp — 인계 (2026-09-02, compact 직전)
 
 ## 브리프 (사용자 원문, 축약 금지)
@@ -208,3 +212,129 @@ D2 근거: 게이트 분포에서 pos_err 0.25~0.5 m 구간이 전체의 29%. �
 
 D4·D5 는 코드 변경이며, `reject_pos` 117 대 `reject_rot` 4 라는 비대칭(회전은
 2.04° 로 정확, 병진만 0.342 m 로 부정확)이 그 근거다.
+
+---
+
+# 인계 2026-09-04 — 사이클 종료
+
+제약 조건은 이 문서 맨 위 **브리프 (사용자 원문)** 그대로 유효하다. 2026-09-04 에
+하나 추가됐다: *"tilt 30 은 성능 감소가 있지만 어쩔 수 없이 만족해야 하는 사항이다."*
+→ 정본 틸트 30°, tilt10 은 **회귀 가드로만** 쓰고 이득 크기는 더 재지 않는다.
+
+## 지금 어디까지 왔나
+
+**DR 폴백** shallow 4.27 → **0.50%**(8.5배) · tilt30 15.15 → **5.39%**(2.8배) ·
+tilt10 3.30 → 1.77%. 오프라인 게이트 tilt30 83.0 → 89.9% · shallow 92.7 → 96.0%.
+
+채택 설정 (`src/stonefish_slam/config/slam.yaml`):
+
+```yaml
+trans_lowpass: 0.5 · trans_clahe: false · trans_window: 'hann'
+warp_retry: true · dft_refinement_enable: false
+rotation_candidates: 9 · max_position_error: 0.25   (둘 다 변경 없음)
+keyframe_max_angular_vel: 0.0                        (되살렸으나 끔)
+```
+
+Phase D~K 판정표와 실측은 `PLAN-PHASE4.md` 말미와
+`/workspace/experiments/slam-tilt30/SUMMARY.md`.
+
+## 승인 대기 (사람 게이트, 손대지 말 것)
+
+1. **push + PR 개설.** `src/stonefish_slam` 브랜치 `exp/tilt30-localization`,
+   origin 대비 **ahead 6**. 본문 초안은 이 디렉터리의 `PR-BODY-DRAFT.md`
+   (126 줄, 커밋 6건·기각 2건·미결 3건 반영 완료).
+2. **sim PR #28 상호 링크.** slam pytest 의 유일한 실패
+   `test_sonar_tilt_matches_sim_scenario`(로컬 sim `.scn` 10.0° vs slam.yaml 30.0°)가
+   그 PR 이 머지되면 해소된다. CONTRIBUTING §5 가 상호 링크를 요구한다.
+3. 메타 repo `.hq` 기록 push (이 인계문 포함).
+
+## 미결 3건 — 다음 세션의 실제 일감
+
+### (1) 병진 압축 ≈ 7~8% — 사용자가 RViz 에서 눈으로 확인한 것
+
+키프레임 사이 병진이 매번 짧게 들어간다. 두 값의 곱이다:
+
+| 단계 | 값 | 출처 |
+|:--|--:|:--|
+| FFT 시드 / 실제 | 0.929 (tilt30) · 0.936 (shallow) | 오프라인, DR=GT 대비 |
+| ICP 결과 / 시드 | 0.994 | 온라인 `[INSTR] scale ratio` |
+| 누적 | **≈ 0.923** | |
+
+가설 5개(틸트 보정·고도 가정·극→직교 보간·대역 포락선·회전 결합)는 전부 반증됐다.
+저역통과가 0.912 → 0.929 로 **처음** 움직였을 뿐 나머지는 그대로다.
+
+⚠️ **계측이 이걸 못 본다. 이게 먼저 손댈 지점이다.**
+- 온라인 `[INSTR] scale ratio` 는 **시드 대비**다(`core/slam.py:1364-1365`,
+  `init_norm`=시드·`est_norm`=ICP 결과). 진실 대비가 아니라 0.99 로 건강해 보인다.
+- `dist_total` 은 **GT 를 누적**한다(`core/slam_accuracy_monitor.py:282-288`,
+  `_accumulate_total_distance(gt_xy)`). SLAM 궤적 자체의 길이를 재는 계측이
+  파이프라인 어디에도 없다.
+- → **처방**: SLAM 경로 길이를 누적해 GT 대비 비를 `[ACC]` 줄에 찍는다. 몇 줄이고,
+  그러면 "압축돼 보인다"가 매 런 자동으로 숫자가 된다. **사용자에게 제안했고
+  답을 못 받은 상태다 — 먼저 물어볼 것.**
+- ⚠️ `/stonefish_slam/slam/traj` 는 `Path` 가 아니라 **`PointCloud2`** 다
+  (`core/slam.py:636`, `ros_colorline_trajectory`). `Path` 로 구독하면 조용히 0 건이다.
+
+### (2) 루프폐합 PCM 수락률 — 그래프 층의 병목
+
+NSSM 깔때기(채택 설정, 런 평균):
+
+| | 시도 | init | ICP | **PCM 수락** |
+|:--|--:|--:|--:|--:|
+| shallow | 100% | 98.8% | 96.3% | **83.1%** |
+| tilt30 | 100% | 98.3% | 89.4% | **66.2%** |
+
+**초기화는 병목이 아니다(98%)** — 옛 E6("NSSM 시드를 FFT 로")의 전제가 무너진다.
+떨어지는 곳은 tilt30 의 ICP(89.4%)와 **PCM 수락(66.2%)** 이다. 그리고
+`pcm_accepted` 가 baseline 115.0 대 채택 114.8 로 **똑같다** — 밤새 한 작업은 이
+층을 전혀 안 건드렸고, 궤적 오차가 3.6~4.0 m 에서 안 움직인 이유가 여기다.
+
+미확인 2건: PCM 이 **왜** 기각하는지(임계인지 진짜 나쁜 후보인지), 기각된 후보가
+실제로 옳은 폐합이었는지. 그걸 가르는 계측이 지금 로그에 없다.
+
+NSSM 탐색 범위 (자주 오해되는 지점, `core/localization.py:461-474`):
+- **source(질의) = 최근 5 키프레임만** (`source_frames=5`)
+- **target(탐색) = 0 번부터 current−15 까지 전부** (`min_st_sep=15`) — 최근만 보는 게 아니다
+- 기하 게이트는 source 공분산 기반 `5σ + range_max` / `5σ + FOV/2` (`:477-491`)
+- ⚠️ **가설(미확인)**: 게이트는 *추정* 포즈 중심이라, 궤적이 압축돼 있으면 진짜
+  재방문 지점이 반경 밖으로 밀린다 → (1)과 (2)가 서로를 먹인다.
+
+### (3) 2D 궤적 오차 지표의 판별력 — 이월
+
+비교 기준 토픽이 DR 시드 출처와 같다(`core/traj_2d_error_accumulator.py:38-41`).
+다만 그 교란이 **작동하지 않는다**는 것도 측정됐다(전후창 85 쌍, 48% = 우연) —
+`finding/025`. 가르는 probe: odometry 에 잡음을 얹어 별 토픽으로 재발행 → SLAM
+입력만 remap → `ground_truth_topic:=/bluerov2/odometry` 로 기준은 깨끗한 GT 유지.
+파라미터가 이미 있어 배선만 하면 된다. **미실행.**
+
+## 이번 사이클이 남긴 방법론 (읽고 시작할 것)
+
+- `finding/025` — 구조적 교란이 **있다**는 것과 **작동한다**는 것은 다르다.
+- `finding/026` — 게이트가 **절대** 임계면 판별력은 중앙값이 아니라 **분위수**다.
+- `finding/027` — **CPU 를 쓰는 오프라인 이득은 온라인에서 스스로를 상쇄한다.**
+  고정 쌍 집합 하네스는 이 되먹임을 구조적으로 못 본다.
+- ⚠️ **"옛 기준선에서 기각된 축이 새 기준선에서 되살아나기" 가 이번에만 3회**
+  (대역통과·DFT 보정·K=15). **기각 기록에 "무엇과 비교해서"를 반드시 남길 것.**
+- `p=0.014` 는 n=4 대 4 의 **최소 달성값**. n=3 짜리 유의성은 복제 하나에 부서진다.
+
+## 도구·경로
+
+| | |
+|:--|:--|
+| 런너 | `/workspace/experiments/slam-tilt30/run_replay.sh <label> [tilt30\|tilt10\|shallow]`, `YAML_SET="k=v;k=v"` 로 덮어쓰기 |
+| 오프라인 | `offline/eval_fft.py <cache>.npz --prod --set "k=v;..."` (캐시 `tilt30_kf` 188 쌍 · `shallow_kf` 354 쌍) |
+| 최고설정 데모 | `tools/demo_best.sh` (shallow + TF 보충, RViz 는 따로 띄울 것) |
+| TF 보충 | `tools/odom_tf_bridge.py` — shallow bag 에 `/tf` 가 없어 RViz 용으로 필요 |
+| 경로길이 측정 | `tools/pathlen.py` — ⚠️ traj 를 `Path` 로 받게 돼 있어 **고쳐야 동작한다**(PointCloud2) |
+| 결과 SSOT | `/workspace/experiments/slam-tilt30/SUMMARY.md` |
+
+## 환경 함정 (반복 발생)
+
+- `evaluator.sh` 는 `OMX_PROJECT_DIR` 미설정 시 **`/workspace` 를 검사** — 워크트리 결과가 아니다.
+- **`localization.py` 는 CRLF.** 파이썬으로 통째 rewrite 하면 628 줄 가짜 diff 가 난다.
+- 오프라인 `--set` 은 `eval()` — 문자열 값에 따옴표 필수(`trans_window='hann'`).
+- `pgrep -f`/`pkill -f` 는 **자기 셸을 죽인다** → `ps -eo pid,args | awk '/[p]attern/'`.
+- **bag 재생과 오프라인 평가 동시 실행 금지**(둘 다 `scipy.fft(workers=-1)`).
+- 실험 런은 `ROS_DOMAIN_ID=77` + `OMP/OPENBLAS/MKL/NUMEXPR_NUM_THREADS=4`
+  (스레드 상한이 없으면 온라인 런이 통째로 무효가 된다 — `finding/022`).
+- 런처가 죽어도 `slam_node` 와 `odom_tf_bridge` 가 살아남는다. 다음 런 전에 확인할 것.
