@@ -1,6 +1,6 @@
 # INDEX — stonefish_ws
 
-> 27 posts · regenerated 2026-09-04 by `hq index`
+> 29 posts · regenerated 2026-09-04 by `hq index`
 
 ## decision
 - `decision/002` [subject: naming-rules-codify] codify 2026-06-23 — 글롭 수정·약어 예외·specificity 재계산 — codify 2026-06-23 — 글롭 수정·약어 예외·specificity 재계산
@@ -31,6 +31,8 @@
 - `finding/025` [subject: trajectory-error-cannot-judge-dr-seed] DR 폴백은 궤적 오차를 GT 로 되돌리지 않는다 — 예측된 계측 교란이 작동하지 않는다 — 구조상 비교 기준 토픽이 DR 시드 출처와 같지만, 전후창 85쌍에서 DR 폴백 후 오차 감소가 48%(=우연) — 교란은 예측되나 작동하지 않는다. −0.671 은 군간 상관이며 원인은 DR 횟수가 아니라 설정. 채택 설정의 궤적 오차 우려는 복제 n=5 에서 p=0.123 으로 종결(비유의). 잡음 odometry probe 는 미실행.
 - `finding/026` [subject: dft-subpixel-refinement-tail] DFT 서브픽셀 보정은 중앙값이 아니라 꼬리를 망치고 있었다 — 끄면 reject_pos 중앙 18→12(완전 분리 p=0.014)·featF +2.9%·DR 폴백 1.22→0.50%, 궤적 오차 동률. 오프라인에서 중앙값은 0.127→0.119 로 거의 안 변하고 p75 만 0.190→0.159(-16%) — 0.25 m 절대 게이트는 그 꼬리를 본다. 게이트 통과율만 보던 Tier A 가 이 축을 '동률'로 기각했던 이유.
 - `finding/027` [subject: offline-gain-self-cancels-online] CPU 를 쓰는 오프라인 이득은 온라인에서 스스로를 상쇄한다 — K 9→15 는 오프라인 게이트를 tilt30 +2.6%p 올리지만 온라인에선 동률이고 featF 만 −15%. 비용이 프레임을 버리게 하고, 버려진 프레임이 키프레임 간격을 벌려 쌍을 어렵게 만든다. 오프라인 하네스는 고정 쌍 집합이라 이 되먹임을 구조적으로 못 본다. 살아남은 세 변경은 전부 CPU 를 안 쓰거나 아꼈다.
+- `finding/028` [subject: slam-path-length-vs-gt] SLAM 궤적은 GT 보다 15.4% 짧다 — 그걸 재는 계측이 없었다 — 채택 설정 shallow 재생에서 SLAM 경로 276.4 m 대 GT 326.7 m = len_ratio 0.846(15.4% 압축). 같은 런의 drift_window 0.916% · scale ratio 중앙 0.9949 는 둘 다 건강해 보인다 — scale ratio 는 ICP 를 자기 시드와 견주고 dist_total 은 GT 를 누적해서, 추정 궤적 자체의 길이를 재는 계측이 없었다. drift 가 못 보는 이유는 umeyama_se2 가 강체 정합이라 균일 축소를 흡수하기 때문(7% 압축 -> drift 2.04%, 3.4배 과소보고). 프로그램의 기존 추정 0.923(시드비 0.929 x ICP비 0.994)의 두 배이며 차이의 기전은 미확증(팩터그래프 최적화 / 오프라인 모집단 차이 후보). n=1.
+- `finding/029` [subject: accuracy-metrics-silent-without-tf] shallow bag 런의 정확도 지표는 러너 밖 프로세스에 의존하고 있었다 — shallow bag 재생 런에 [ACC] 줄이 0건이었다 — 에러·경고 없이. 그 bag 은 bringup.launch.py 로 녹화돼 /tf 가 remap 됐고, 관측기의 GT lookup(world_ned -> bluerov2/base_link_frd)이 매번 실패해 모든 지표가 조기 return 뒤에 있다. 9/3 런에 지표가 있던 것은 그때 우연히 odom_tf_bridge 계열 프로세스가 같은 도메인에 떠 있었기 때문 — 런 설정은 안 바뀌었는데 그 프로세스가 정리되자 지표만 사라졌다. 처방 2건: 관측기가 20회 연속 lookup 실패를 경고 1회로 신고(af46ae8), 러너가 bag 이름이 아니라 ros2 bag info 로 /tf 유무를 보고 브리지를 띄우고 끝에 죽임. CLAUDE.md 의 'RViz 표시만 안 됩니다' 서술은 과소평가였다.
 
 ## review
 - `review/005` [subject: git-compliance-review] git 규칙 준수 검토 (2026-07-23, 배포 준비 세션) — git 규칙 준수 검토 (2026-07-23, 배포 준비 세션)

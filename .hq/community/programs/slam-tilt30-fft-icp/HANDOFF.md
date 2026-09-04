@@ -258,7 +258,12 @@ Phase D~K 판정표와 실측은 `PLAN-PHASE4.md` 말미와
 |:--|--:|:--|
 | FFT 시드 / 실제 | 0.929 (tilt30) · 0.936 (shallow) | 오프라인, DR=GT 대비 |
 | ICP 결과 / 시드 | 0.994 | 온라인 `[INSTR] scale ratio` |
-| 누적 | **≈ 0.923** | |
+| 두 단 곱(추정) | ≈ 0.923 | |
+| **종단 실측 `len_ratio`** | **0.846** | 2026-09-04 shallow 재생 `s14len-b`, 276.4 / 326.7 m |
+
+⚠️ **실측이 추정의 두 배다**(15.4% vs 7.7%). 차이의 기전은 미확증 — 팩터그래프
+최적화가 더 당기는 것인지, 오프라인 고정 쌍 집합과 온라인 키프레임 스트림의
+모집단 차이인지. `finding/028`. n=1, 복제 미측정.
 
 가설 5개(틸트 보정·고도 가정·극→직교 보간·대역 포락선·회전 결합)는 전부 반증됐다.
 저역통과가 0.912 → 0.929 로 **처음** 움직였을 뿐 나머지는 그대로다.
@@ -269,9 +274,15 @@ Phase D~K 판정표와 실측은 `PLAN-PHASE4.md` 말미와
 - `dist_total` 은 **GT 를 누적**한다(`core/slam_accuracy_monitor.py:282-288`,
   `_accumulate_total_distance(gt_xy)`). SLAM 궤적 자체의 길이를 재는 계측이
   파이프라인 어디에도 없다.
-- → **처방**: SLAM 경로 길이를 누적해 GT 대비 비를 `[ACC]` 줄에 찍는다. 몇 줄이고,
-  그러면 "압축돼 보인다"가 매 런 자동으로 숫자가 된다. **사용자에게 제안했고
-  답을 못 받은 상태다 — 먼저 물어볼 것.**
+- → **처방: 2026-09-04 승인·구현 완료.** `slam_accuracy_monitor` 가 매 `[ACC]` 줄에
+  `dist_slam=<m>` 과 `len_ratio=<SLAM/GT>` 를 찍는다(`polyline_length_2d`,
+  `core/slam_accuracy_monitor.py:51`). `parse_metrics.py` 의 `ACC_FIELD_RE` 가
+  key=value 를 통으로 긁으므로 파서 변경 없이 `metrics.json` 에 들어간다.
+  ⚠️ `keyframe_stride > 1` 이면 폴리라인이 과소계산되므로 `nan` 을 낸다.
+- **왜 drift 지표로는 안 보였나** — `umeyama_se2` 는 강체 정합이라 균일하게 줄어든
+  경로도 GT 위로 회전·평행이동해 얹힌다. 실측: 7% 균일 압축이 `drift_window`
+  **2.04%** 로만 나온다(3.4배 과소보고). 회귀 가드는
+  `test_accuracy_monitor_drift.py::test_uniform_translation_compression_shows_up_as_the_length_ratio`.
 - ⚠️ `/stonefish_slam/slam/traj` 는 `Path` 가 아니라 **`PointCloud2`** 다
   (`core/slam.py:636`, `ros_colorline_trajectory`). `Path` 로 구독하면 조용히 0 건이다.
 
@@ -325,7 +336,8 @@ NSSM 탐색 범위 (자주 오해되는 지점, `core/localization.py:461-474`):
 | 오프라인 | `offline/eval_fft.py <cache>.npz --prod --set "k=v;..."` (캐시 `tilt30_kf` 188 쌍 · `shallow_kf` 354 쌍) |
 | 최고설정 데모 | `tools/demo_best.sh` (shallow + TF 보충, RViz 는 따로 띄울 것) |
 | TF 보충 | `tools/odom_tf_bridge.py` — shallow bag 에 `/tf` 가 없어 RViz 용으로 필요 |
-| 경로길이 측정 | `tools/pathlen.py` — ⚠️ traj 를 `Path` 로 받게 돼 있어 **고쳐야 동작한다**(PointCloud2) |
+| 경로길이 측정 | **관측기에 들어갔다** — `[ACC]` 줄의 `dist_slam=` · `len_ratio=`(SLAM 경로길이 / GT). `evaluate:=true` 면 매 런 자동. `metrics.json` 의 `accuracy_last` 에도 그대로 들어간다 |
+| ~~`tools/pathlen.py`~~ | **사산·미삭제.** traj 를 `Path` 로 받는데 실제는 `PointCloud2` 이고, GT 로 쓰던 `/bluerov2/actual_trajectory` 는 **발행자가 코드 어디에도 없다** — 돌려도 25 초 대기 후 빈 목록만 낸다. 위 관측기 계측이 대체하므로 지울 것(이 마운트에 `gio trash` 가 안 돼 보류) |
 | 결과 SSOT | `/workspace/experiments/slam-tilt30/SUMMARY.md` |
 
 ## 환경 함정 (반복 발생)

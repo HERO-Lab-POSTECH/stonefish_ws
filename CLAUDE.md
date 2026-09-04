@@ -112,7 +112,7 @@ SLAM 쪽 변경은 매번 시뮬을 띄우지 말고 **한 번 녹화한 bag을 
 |:--|:--|
 | `data/bags/2026-09-02-bluerov2-lawnmower-tilt10/` | 시뮬 녹화. lawnmower 424 s · FLS 7,380 프레임 · odometry/imu/dvl/pressure/altitude/INS/tf, 시뮬 FLS 하향 10° 시점 |
 | `data/bags/2026-09-02-bluerov2-lawnmower-tilt30/` | 시뮬 녹화(sim PR #28 상태, FLS 하향 30°). 같은 lawnmower · 2.0 GB. SLAM 궤적이 발산하는 런이라 **틸트 A/B 비교용**이지 회귀 기준선이 아님 |
-| `data/bags/2026-09-03-bluerov2-lawnmower-tilt30-shallow/` | 시뮬 녹화(FLS 하향 30°). 같은 lawnmower 박스지만 **미션 100% 완주** — 639 s · FLS 11,135 프레임 · 경로 326 m(tilt30 bag 은 172 m 에서 끊김). 임무 심도 2.5 m 라 고도 ~6.4 m(tilt30 은 4.55 m). ⚠️`bringup.launch.py` 로 녹화해 `/tf` 가 remap 되어 **bag 에 `/tf` 가 없습니다** — SLAM 은 영향 없고 RViz 표시만 안 됩니다 |
+| `data/bags/2026-09-03-bluerov2-lawnmower-tilt30-shallow/` | 시뮬 녹화(FLS 하향 30°). 같은 lawnmower 박스지만 **미션 100% 완주** — 639 s · FLS 11,135 프레임 · 경로 326 m(tilt30 bag 은 172 m 에서 끊김). 임무 심도 2.5 m 라 고도 ~6.4 m(tilt30 은 4.55 m). ⚠️`bringup.launch.py` 로 녹화해 `/tf` 가 remap 되어 **bag 에 `/tf` 가 없습니다** — SLAM 추정은 영향 없지만 **정확도 관측기(`[ACC]` 줄)가 통째로 침묵합니다**(GT TF lookup 실패, `finding/029`). `run_replay.sh` 는 bag 에 `/tf` 가 없으면 `tools/odom_tf_bridge.py` 를 자동으로 띄웁니다 |
 | `data/bags/gucki_merge/통합_world_ned/` | 실해역 수령(맥 이관). 510 s · 20,391 msg · `/knu/enhancement/keyframe/compressed` 등, 이미 `world_ned` 정렬. 재생 설정은 형제 `통합.rviz` |
 
 ```bash
