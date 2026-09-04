@@ -79,10 +79,23 @@ bash .hq/config/experiments/profile/evaluator.sh
 ### 시뮬레이터 실행
 
 ```bash
-ros2 launch stonefish_ros2 bluerov2.launch.py                  # 터미널 A: 시뮬
-ros2 launch stonefish_trajectory_manager path.launch.py        # 터미널 B: 경로추종+제어
-ros2 launch stonefish_slam slam.launch.py vehicle_name:=bluerov2   # 터미널 C: SLAM
+# 한 줄로 — 시뮬 + 제어 + 경로추종을 전부 배선하는 최상위 launch
+ros2 launch stonefish_ros2 bringup.launch.py
+
+# 또는 쪼개서. 셋을 다 띄워야 로봇이 움직입니다.
+ros2 launch stonefish_ros2 bluerov2.launch.py                  # 터미널 A: 시뮬만
+ros2 launch stonefish_control control.launch.py                # 터미널 B: 하이브리드 제어기
+ros2 launch stonefish_trajectory_manager path.launch.py        # 터미널 C: 경로생성+ILOS 추종
+ros2 launch stonefish_slam slam.launch.py vehicle_name:=bluerov2   # 터미널 D: SLAM
 ```
+
+⚠️ **`path.launch.py`는 제어기를 띄우지 않습니다** — 경로 생성과 ILOS 추종만 하고
+setpoint 를 낼 뿐이라, 이것만 띄우면 ROV 는 부력으로 수면에 뜬 채 Progress 0% 로
+멈춰 있습니다(docstring: "launches NO simulator and NO controller").
+
+⚠️ **라이브 시뮬에는 `use_sim_time:=true` 를 주지 마십시오.** 시뮬은 `/clock` 을
+내지 않으므로 모든 노드 시계가 0 에 얼어붙고 50 Hz 경로추종 타이머가 영원히 안
+돕니다. `/clock` 이 있는 것은 bag 재생뿐입니다(아래 재생 절차).
 
 시뮬레이터는 **OpenGL 4.3+ GPU 렌더링이 필수**입니다 — headless/GPU 없는 컨테이너에서는
 띄울 수 없고, 그런 환경에서 가능한 검증은 pytest fast gate까지입니다. 닫힌루프 궤적 오차
@@ -99,6 +112,7 @@ SLAM 쪽 변경은 매번 시뮬을 띄우지 말고 **한 번 녹화한 bag을 
 |:--|:--|
 | `data/bags/2026-09-02-bluerov2-lawnmower-tilt10/` | 시뮬 녹화. lawnmower 424 s · FLS 7,380 프레임 · odometry/imu/dvl/pressure/altitude/INS/tf, 시뮬 FLS 하향 10° 시점 |
 | `data/bags/2026-09-02-bluerov2-lawnmower-tilt30/` | 시뮬 녹화(sim PR #28 상태, FLS 하향 30°). 같은 lawnmower · 2.0 GB. SLAM 궤적이 발산하는 런이라 **틸트 A/B 비교용**이지 회귀 기준선이 아님 |
+| `data/bags/2026-09-03-bluerov2-lawnmower-tilt30-shallow/` | 시뮬 녹화(FLS 하향 30°). 같은 lawnmower 박스지만 **미션 100% 완주** — 639 s · FLS 11,135 프레임 · 경로 326 m(tilt30 bag 은 172 m 에서 끊김). 임무 심도 2.5 m 라 고도 ~6.4 m(tilt30 은 4.55 m). ⚠️`bringup.launch.py` 로 녹화해 `/tf` 가 remap 되어 **bag 에 `/tf` 가 없습니다** — SLAM 은 영향 없고 RViz 표시만 안 됩니다 |
 | `data/bags/gucki_merge/통합_world_ned/` | 실해역 수령(맥 이관). 510 s · 20,391 msg · `/knu/enhancement/keyframe/compressed` 등, 이미 `world_ned` 정렬. 재생 설정은 형제 `통합.rviz` |
 
 ```bash
