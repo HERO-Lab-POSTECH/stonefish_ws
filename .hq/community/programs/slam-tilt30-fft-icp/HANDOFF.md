@@ -670,13 +670,46 @@ p=0.05 로 읽는다.** 다른 시간창의 기준선과 견준 완전분리는 
 −0.94). **`finding/043` 과 같은 실수를 같은 세션에서 반복한 것** — 중간 런
 하나의 수치를 기전 서술로 승격. 산포가 큰 계열에서 런 하나는 기전이 아니다.
 
-## 다음 축 (준비됨·미적용)
+## 이방화 축 — 검정 완료, 기각 (`finding/047`)
 
-`slam_loop_along_sigma_scale` — 루프 인자 공분산의 전진축 표준편차만 배율.
-인자 자신의 병진 방향을 전진축으로 잡아 회전시켜 x 분산만 키우고 되돌린다
-(대칭·양정 유지). 구현·단위테스트 2 건은 scratchpad 에 준비돼 있고 아직
-repo 에 넣지 않았다. **압축을 줄이려는 개입이 아니라 없는 정보를 신뢰하지
-않게 하는 개입**이라 finding/041·042 가 닫은 축들과 성격이 다르다.
+`slam_loop_along_sigma_scale=2.5` 를 인터리브 3 쌍으로 걸어 **무승부로 기각**했다
+(구현 `f26cc5e`, 기본값 1.0 유지). ATE base 2.746 · 2.844 · 3.539 대 aniso
+3.201 · 2.218 · 2.868 — 겹치고 1 쌍째는 base 가 이긴다. 6 런 전부 유효대역이고
+DR 의존은 오히려 개선(`seed_dr` base 4·2·2 대 aniso 3·1·0).
+
+카운터가 없는 축의 배선 확인법을 남긴다 — `yaml_set.py` 가 없는 키에 `KeyError`
+로 exit 3 하므로 override 누락 런이 override 런으로 기록될 수 없고, 설치본
+`install/local/lib/python3.10/dist-packages/…/factor_graph.py:263` 에
+`inflate_loop_cov` 가 있으며, `scale=2.5` 와 루프 변위 2~3 m 로는 조기 반환
+가드(`scale <= 1.0`·`n < 1e-3`) 가 걸릴 수 없다.
+
+## 다음 축 (실행 중)
+
+`min_pcm` **양방향** — 2(느슨) · 4(빡빡) · base 3팔 인터리브 9 런
+(`pcmsweep.txt`, 11:52 착수). 최상위 ros 파라미터라 dot 경로는 `min_pcm` 이지
+`nssm.min_pcm` 이 아니다(첫 시도가 `KeyError` 로 걸렸다). yaml 손잡이라 코드
+변경·리빌드 오염이 없다.
+
+근거 둘. (a) 오늘자 유효런 13 개에서 `len_ratio`↔ATE 상관이 **−0.730**(기저
+8 런만이면 −0.839)로 어떤 카운터보다 강하고 `pcm_accepted` 가 `len_ratio` 와
++0.446 · ATE 와 −0.423 이다. (b) `verify_pcm` 의 Mahalanobis 게이트가
+`ret_jk.cov` 한쪽만 쓰고 odometry 경로 공분산을 빼먹어 **명목 0.99 보다 엄격**
+하다고 코드 주석이 자인한다(`factor_graph.py:365-372`).
+
+**양방향인 이유** — `finding/043`·`046` 이 각각 "틀려 보이는 양을 옳은 방향으로
+밀면 나빠진다" 를 저질렀다. 느슨(2) 만 걸면 그 함정의 세 번째다.
+
+## 러너 함정 추가
+
+- **러너는 매 런 `colcon build --merge-install --packages-select stonefish_slam`
+  을 돈다**(`run_replay.sh:82`). 큐가 도는 동안 slam 소스를 건드리면 남은 런이
+  오염된다. 코드 편집은 큐 종료 후에만.
+- `Monitor` 는 기본 300 s 로 죽고 "timed out" 만 남긴다. 큐 생사는 알림이 아니라
+  `ps -eo pid,etime,args | awk '/[r]un_replay.sh/'` 로 본다.
+- ⚠️ **`hq post` 는 cwd 의 앵커로 간다.** `/workspace/experiments/…` 에서 부르면
+  `/workspace/.hq`(정체된 별도 체크아웃) 에 쓰인다 — findings 039~047 이 사는
+  워크트리 스토어가 아니다. 이번에 한 번 당했고 `/workspace/.hq/…/016-ate.md` 가
+  미추적으로 남아 있다(권한 거부로 제거 못 함, 사람 처리 필요).
 
 ## 사람 결정 (2026-09-05 회신 반영)
 
