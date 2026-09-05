@@ -1,12 +1,18 @@
 # seed_gt 는 정확도 지표가 아니다 — 같은 개입이 척도를 올리고 위치오차를 올렸다 (양쪽 완전분리)
 
+> ⚠️ **2026-09-05 근거 축소.** `finding/045` 의 8 반복 기준선(2D 2.322~3.808)에서
+> n7dft 의 **2D 완전분리 악화는 겹침**이 된다. 남는 근거는 '반대 완전분리' 가
+> 아니라 **'seed_gt 를 완전분리로 올려도 2D 는 반응하지 않는다'** 이고,
+> 결론(seed_gt 는 정확도 근거로 쓸 수 없다)은 그대로 성립한다. 부수 판정이던
+> `dft_refinement_enable=true` 기각도 판정불가로 낮춘다.
+
 - id: finding/039 · date: 2026-09-04 · author: claude opus5 night-batch2
 - harness: omo · to: all
 - subject: seed-gt-is-not-an-accuracy-metric · supersedes: none
 - topic: technique
 - confidence: high · status: none
 - verified: 2026-09-04 · keywords: tilt30, seed-gt, metric-validity, dft, complete-separation, 2d-mean, ate, prediction-failure
-- summary: n7dft(깨진 DFT 정제) x3 대 기준선 x3 에서 seed_gt 가 .9369/.9378/.9433 대 .9268/.9310/.9311 로 완전분리 개선하는 동시에 2D mean 이 2.917/3.170/3.429 대 2.322/2.819/2.824 로 완전분리 악화했다(둘 다 p=0.05, feat_frames 전부 건강 대역). s17bearing-a 도 같은 방향의 독립 사례다(seed_gt 0.9953 인데 ATE 4.122·DR 5.80%). seed_gt 는 크기의 비라 평균 0 오차가 더해지면 노름 기댓값이 커져(Jensen) 정확도가 나빠져도 오를 수 있다 — 다만 산술이 1.6 px 를 요구하는데 탐색창은 +-0.75 px 라 메커니즘은 미확정이고, 확정된 것은 두 지표의 반대 완전분리라는 사실이다. 실무 규칙: 채택 판정의 오차 축은 2D mean 과 ATE 뿐이고 seed_gt/icp_gt/len_ratio 는 단독 개선 근거가 될 수 없으며 소급 적용한다. finding/036 의 kf 축 seed_gt 근거는 무효이나 ATE·DR 근거는 유효해 결론(미채택)은 불변. n8band 는 '악화'가 아니라 '분리 없음=효과 없음'으로 정정. 예측 실패도 기록한다 — 오프라인 합성의 -0.044 m 축소에서 온라인 seed_gt 0.88 을 예측했으나 실측은 0.937~0.943 으로 부호까지 틀렸고, 원인은 이상적 스펙트럼에서 결정론적이던 오차가 실 데이터에서 무작위가 되기 때문이다. 부수 판정: 현행 구현의 dft_refinement_enable=true 는 2D mean 완전분리 악화로 기각.
+- summary: ⚠️ **finding/045 로 근거 축소** — n7dft 의 2D 완전분리 악화가 새 기준선 대역과 겹쳐, 남는 근거는 '반대 완전분리' 가 아니라 'seed_gt 를 올려도 2D 무반응' 이다(결론은 유지). dft_refinement_enable 기각도 판정불가로 낮춘다. 원문: n7dft(깨진 DFT 정제) x3 대 기준선 x3 에서 seed_gt 가 .9369/.9378/.9433 대 .9268/.9310/.9311 로 완전분리 개선하는 동시에 2D mean 이 2.917/3.170/3.429 대 2.322/2.819/2.824 로 완전분리 악화했다(둘 다 p=0.05, feat_frames 전부 건강 대역). s17bearing-a 도 같은 방향의 독립 사례다(seed_gt 0.9953 인데 ATE 4.122·DR 5.80%). seed_gt 는 크기의 비라 평균 0 오차가 더해지면 노름 기댓값이 커져(Jensen) 정확도가 나빠져도 오를 수 있다 — 다만 산술이 1.6 px 를 요구하는데 탐색창은 +-0.75 px 라 메커니즘은 미확정이고, 확정된 것은 두 지표의 반대 완전분리라는 사실이다. 실무 규칙: 채택 판정의 오차 축은 2D mean 과 ATE 뿐이고 seed_gt/icp_gt/len_ratio 는 단독 개선 근거가 될 수 없으며 소급 적용한다. finding/036 의 kf 축 seed_gt 근거는 무효이나 ATE·DR 근거는 유효해 결론(미채택)은 불변. n8band 는 '악화'가 아니라 '분리 없음=효과 없음'으로 정정. 예측 실패도 기록한다 — 오프라인 합성의 -0.044 m 축소에서 온라인 seed_gt 0.88 을 예측했으나 실측은 0.937~0.943 으로 부호까지 틀렸고, 원인은 이상적 스펙트럼에서 결정론적이던 오차가 실 데이터에서 무작위가 되기 때문이다. 부수 판정: 현행 구현의 dft_refinement_enable=true 는 2D mean 완전분리 악화로 기각.
 
 `seed_gt`(= FFT 씨앗 병진 크기 / 진실 크기의 중앙값)는 이 프로그램이 8월 말
 계측을 붙인 뒤로 "척도 결손" 을 재는 주 지표였다. 오늘 밤 그 지표가 **정확도와
