@@ -339,7 +339,7 @@ NSSM 탐색 범위 (자주 오해되는 지점, `core/localization.py:461-474`):
 |:--|:--|
 | 런너 | `/workspace/experiments/slam-tilt30/run_replay.sh <label> [tilt30\|tilt10\|shallow]`, `YAML_SET="k=v;k=v"` 로 덮어쓰기 |
 | 오프라인 | `offline/eval_fft.py <cache>.npz --prod --set "k=v;..."` (캐시 `tilt30_kf` 188 쌍 · `shallow_kf` 354 쌍) |
-| 최고설정 데모 | `tools/demo_best.sh` (shallow + TF 보충, RViz 는 따로 띄울 것) |
+| 최고설정 데모 | `RVIZ=true PROJECTION=altitude bash run_replay.sh <라벨> shallow` (TF 보충은 러너가 자동). ~~`tools/demo_best.sh`~~ 는 **실재하지 않는다** — 2026-09-05 확인 |
 | TF 보충 | `tools/odom_tf_bridge.py` — shallow bag 에 `/tf` 가 없어 RViz 용으로 필요 |
 | 경로길이 측정 | **관측기에 들어갔다** — `[ACC]` 줄의 `dist_slam=` · `len_ratio=`(SLAM 경로길이 / GT). `evaluate:=true` 면 매 런 자동. `metrics.json` 의 `accuracy_last` 에도 그대로 들어간다 |
 | ~~`tools/pathlen.py`~~ | **사산·미삭제.** traj 를 `Path` 로 받는데 실제는 `PointCloud2` 이고, GT 로 쓰던 `/bluerov2/actual_trajectory` 는 **발행자가 코드 어디에도 없다** — 돌려도 25 초 대기 후 빈 목록만 낸다. 위 관측기 계측이 대체하므로 지울 것(이 마운트에 `gio trash` 가 안 돼 보류) |
@@ -794,6 +794,80 @@ base 와 구별되지 않는다.
   그리고 캡처한 pid 는 **믿기 전에 전체 ps 줄을 눈으로 확인하라.**
 - 대기 루프 끝의 `grep` 이 아직 결과가 없으면 exit 1 이라 작업 전체가 "failed" 로
   보고된다. `|| true` 를 붙일 것.
+
+## 시각 확인 세션 (2026-09-05 17:26~17:45) — 사람이 눈으로 채택 설정을 검수했다
+
+`RVIZ` 를 켠 데모 런 `viz-pcm4_260905_172648`(기본 설정 = `min_pcm 4`)을 shallow bag 으로
+완주시키고, 완료 런 3개를 `showtraj.py` + `viz.rviz` 로 GT 와 겹쳐 띄웠다.
+
+**사람 판정 2건 — 둘 다 계측과 일치했다.**
+
+1. "파란색(pcm4)이 제일 성능이 좋아 보인다" — base(min_pcm 3) 대비 육안 우세.
+   `finding/048` 의 채택 판정과 같은 방향이다.
+2. "궤적이 압축돼 보인다, 격자로 2.7칸 정도" — GT 30 m(3칸) 대비 27 m.
+   런 자체 `len_ratio` 0.9015 · 호길이비 0.899 · RMS 반경비 0.888 과 일치한다.
+   처음 말한 "3/4" 는 어림값이었고 격자로 세어 스스로 정정했다.
+
+**꼼수 여부를 계측으로 검증했다** (사용자 질의). `viz-pcm4` 런 카운터:
+
+| 항목 | 값 | 의미 |
+|---|---|---|
+| `factor_odom` | **0** | DR/오도메트리가 팩터 그래프에 들어간 적 없음 |
+| `factor_icp` | 349 | 모든 포즈 간 제약이 ICP 결과 |
+| `seed_fft` / `seed_dr` | 346 / 3 | ICP 시드의 99.1% 가 FFT 위상상관 |
+| `icp_attempted`/`converged` | 349 / 349 | `icp_rate` 1.0 |
+| `ssm_disabled`/`ssm_init_failed` | 0 / 0 | SSM 항상 가동 |
+| `nssm_attempted`→`pcm_accepted` | 335→328→319→238 | NSSM 정상 |
+| `reject_pos` / `warp` | 18 / **15 of 18** | 게이트 18 기각 → 역워프 15 구제 → 남은 **3 = `seed_dr`** |
+
+마지막 줄에서 **회계가 닫힌다** — DR 유입 경로가 하나뿐이고 그 크기가 계측과 정확히
+맞는다. 제약 4개(FFT+ICP · DR 최소 · SSM/NSSM 필수 · 게이트 불변) 전건 충족.
+
+남는 정직한 단서 하나: 그 3 프레임의 DR 은 시뮬 무노이즈 오도메트리에서 오므로 ICP 가
+정답을 출발점으로 받는다(`finding/014`). 0.86% 이고 시드일 뿐 제약이 아니지만,
+실해역에서는 없는 지름길이다.
+
+## 새 축 — 비평탄 바닥 (미검정, 다음 세션 1순위 후보)
+
+사용자 지적: "실제로 바닥이 평탄하지 않은데?" **맞고, 아직 검정된 적이 없다.**
+
+`feature_extraction.py:246` 은 `h = self.node.altitude_m` — 고도계가 재는 **나대점 한 점**을
+부채꼴 전체에 `sqrt(r²−h²)` 로 똑같이 적용한다. 그런데 이 bag 의 월드는
+`bluerov2_infrastructure` → `world_infrastructure.scn` → **`model.obj` 정적 메시 하나**
+(재질 Rock, scale 1.5, z=10)가 전부이고 **별도의 평탄 해저면이 없다.**
+
+⚠️ **`finding/041` 은 이 축을 닫지 않았다.** 그 스윕은 고도에 **전역 배율 k(0.8~2.0)** 를
+곱한 것이고, 검정한 가설은 "h 가 상수배로 틀렸나" 다. "h 가 부채꼴 안에서 변하나" 는
+표현조차 불가능한 파라미터화였다.
+
+`finding/041` 안에 오히려 이 방향을 지지하는 증거가 있다:
+
+- 척도 최대 k\* 가 stride 1 에서 **1.40**, stride 3 에서 **1.20** 으로 달랐다. 상수배
+  오차라면 변위와 무관해야 한다.
+- 부족분이 변위 무관 **1 픽셀 상수**다 — 프레임마다 편향이 생기고 리셋되는 형태이며,
+  프레임마다 h 를 나대점에서 새로 재는 구조와 부합한다.
+
+가장 값싼 검정: 직전 키프레임들의 3D 점군(OctoMap 이 이미 보유)에서 **방위별 바닥 고도
+h(θ)** 를 뽑아 투영에 쓰고, 인터리브 3블록으로 base 와 붙인다. 채택 조건은 여느 축과
+같다 — 2D·ATE 두 축 동시 완전분리.
+
+## 도구 수정 (이번 세션, 커밋 대상 아님 — `experiments/` 는 git 비공유)
+
+1. **`run_replay.sh:146-149`** — `RVIZ=1` 이 한 번도 동작한 적이 없었다. `rviz:=1` 을
+   넘기면 `slam.launch.py:64` 의 `_as_bool` 이 문자열 `'true'` 만 참으로 읽어 조건에서
+   조용히 빠진다(에러·경고 없음). `case` 로 정규화해 `RVIZ=1`·`true`·`yes` 전부 먹게 고쳤다.
+2. **`showtraj.py:63`** — 런 라벨에 하이픈이 있으면(`viz-pcm4`) 토픽명이
+   `/viz/viz-pcm4` 가 되어 `InvalidTopicNameException` 으로 죽는다. 라벨 정규화 추가.
+3. **`viz.rviz`** — pcm4 표시 토픽을 `/viz/viz_pcm4` 로 맞췄다.
+
+### rviz 를 따로 붙일 때 (반드시)
+
+`run_replay.sh:43` 이 `export ROS_DOMAIN_ID=${TILT30_DOMAIN_ID:-77}` 로 격리하므로
+**rviz2 도 `ROS_DOMAIN_ID=77` 로 띄워야 한다.** 안 그러면 창은 뜨는데 아무것도 안 나온다.
+
+⚠️ 이때 `ros2 topic list` 는 증거가 못 된다 — **구독자만 있어도 토픽이 목록에 뜬다.**
+rviz 가 자기 구독으로 이름을 다 만들어내므로 정상처럼 보인다. `ros2 topic info` 의
+**Publisher count** 를 봐야 갈린다.
 
 ## 사람 결정 (2026-09-05 회신 반영)
 
