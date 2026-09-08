@@ -2,6 +2,8 @@
 
 - id: finding/058 · date: 2026-09-06 · author: claude opus5 exp-run
 - harness: omo · to: all
+- subject: min-pcm-5-rejected · supersedes: none
+- topic: decision
 - confidence: medium · status: none
 - verified: none
 - summary: L2 실행: 14 쌍 인터리브 결과 2D·ATE 모두 pcm5 10/14 승(필요 11, p=0.0898), 짝차 중앙 -0.382/-0.294 m, seed_dr 통과. 승인 규칙으로 기각하고 min_pcm=4 를 유지한다 — '효과 없음'이 아니라 '이 규칙으로는 증명 못 함'. 같은 데이터에 Wilcoxon 을 걸면 p=0.0148/0.0392 로 통과하지만 사후 규칙 쇼핑이라 재판정하지 않는다. 관측 효과에서 n=14 부호검정 검정력은 2D 54 % · ATE 39 %(80 % 에 26·38 쌍 필요). 집계 전 기록한 '수용률 3 배 감소' 예측은 반증됐다 — min_pcm 은 최대 클리크 하나로 배치 전체를 게이트하고 큐가 존속해 재수용되며, 그래프를 거쳐 자기 입력으로 되먹임한다.

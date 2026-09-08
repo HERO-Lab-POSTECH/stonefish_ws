@@ -2,6 +2,8 @@
 
 - id: finding/059 · date: 2026-09-06 · author: claude opus5 exp-run
 - harness: omo · to: all
+- subject: baseline-less-queues · supersedes: none
+- topic: technique
 - confidence: medium · status: none
 - verified: none
 - summary: '가장 성능 좋은 설정' 을 물어 설정별 중앙값을 냈더니 ssm.target_frames=5 가 1 위(2D 중앙 2.141, 전체 최고 단일 런 1.970)였다. 그러나 그 근거로 쓴 기본값 중앙 3.000 은 전 기간 62 런을 모은 값이라 큐 횡단 비교이고 finding/045·051 로 무효다. 큐 파일 전수 감사 결과 queue2(12 런)·queue4(7 런)에 기준선 팔이 0 개 — 총 19 런이 설계상 판정 불가다. 같은 큐 안 팔 비교로는 ssm.target_frames=5 가 네 팔 중 1 위가 맞지만(2.141 vs 2.598~3.170), 기본값 대비 개선폭은 미측정이다. runlist.sh 가 기준선 없는 큐를 조용히 돌리는 것이 원인. 덧붙여 TRAJREC 없이 돈 런은 궤적이 어디에도 안 남아 전체 1·2 위를 rviz 로 다시 볼 수 없다.
