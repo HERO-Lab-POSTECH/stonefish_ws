@@ -21,6 +21,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - 하위 repo에서 코드를 만지기 전 그 repo의 `CLAUDE.md`와 **`docs/CONVENTIONS.md`(그 repo의
   SSOT)**를 먼저 읽습니다. 미해결 이슈는 각 repo `P4_FLAGS.md`에 모여 있으니 거기 적힌
   안티패턴을 새 코드에서 답습하지 않습니다.
+- **bag·가중치 정본은 `data/`**입니다(`data/bags/` 8.7G · `data/models/` YOLO 가중치).
+  `experiments/`는 omx 실험 런 트리이므로 여기에 bag을 두지 않습니다.
+- **`src/_kimminjong_colcon_ws2/`는 2026-08-22 통합이 끝난 동결 아카이브**입니다
+  (`COLCON_IGNORE`, git 이력 없음). 그 안의 `CLAUDE.md`·`AGENTS.md`는 `--symlink-install`·
+  `path_following.launch.py`·`sonar_yolo_ros2` 등 **현행과 모순되는 명령**을 담고 있으니
+  살아있는 지침으로 읽지 마십시오.
+- 루트에서 `find`를 돌릴 땐 생성물 트리를 잘라냅니다 — `build/`·`install/`·`log/`가
+  결과를 덮습니다: `find . -path ./build -prune -o -path ./install -prune -o -path ./log -prune -o -name '<패턴>' -print`.
 
 ## 명령
 
@@ -57,6 +65,11 @@ colcon build --merge-install --packages-select stonefish_slam
 cp build/stonefish_slam/*.so src/stonefish_slam/stonefish_slam/
 ```
 
+**파이썬 핀은 건드리지 않습니다.** 이 컨테이너는 `numpy==1.23.5` · `pytest 7.x`에 묶여 있고
+그 밖의 조합에서는 두 repo 수집이 전면 실패합니다. 이미 내부 모순이 있는 환경이라(설치된
+`opencv-python`이 `numpy>=2`를 선언) 리졸버를 태우면 pip이 조용히 8년 전 버전을 설치하고
+`exit 0`을 냅니다 — 신규 설치는 `--no-deps` + `pip freeze` diff로 확인합니다.
+
 양 repo를 한 번에 판정하는 게이트(`.so` 스테이징 포함, 마지막 줄에 `{"pass": bool}` JSON):
 
 ```bash
@@ -91,7 +104,7 @@ oh-my-experiments(`config/experiments/` — 실험 분석 프로파일)가 함�
 | repo | 내용 |
 |:--|:--|
 | `stonefish` (fork, 1.3.0 고정) | Stonefish 코어 C++ 물리·렌더 라이브러리. `stonefish_ros2`가 `find_package(Stonefish REQUIRED 1.3.0)`로 **exact-version** 매치하므로 upstream master(1.6.0-dev)로는 빌드 실패 |
-| `stonefish_sim` | 멀티패키지. `stonefish_ros2`(C++ 시뮬 브리지) · `stonefish_description`(차량·월드 `.scn`·3D 에셋) · `stonefish_msgs`(인터페이스) · `stonefish_control/`(하위에 `stonefish_control`·`stonefish_control_msgs`·`stonefish_thruster_manager`·`stonefish_trajectory_manager` **4개 패키지**) · `stonefish_albc_bridge`(RL 정책 브리지) |
+| `stonefish_sim` | 멀티패키지 **10개**. `stonefish_ros2`(C++ 시뮬 브리지) · `stonefish_description`(차량·월드 `.scn`·3D 에셋) · `stonefish_msgs`(인터페이스) · `nav_interfaces`(실해역 항법 메시지) · `stonefish_control/`(하위에 `stonefish_control`·`stonefish_control_msgs`·`stonefish_thruster_manager`·`stonefish_trajectory_manager` **4개 패키지**) · `stonefish_albc_bridge`(RL 정책 브리지) · `stonefish_sonar_yolo`(소나 이미지 YOLO 검출) |
 | `stonefish_slam` | 단일 패키지, Python + pybind11 C++ 혼합. `core/`(알고리즘) · `nodes/`(ROS 진입점, core의 얇은 래퍼) · `utils/` · `cpp/`(바인딩 + 순수 파이썬 fallback) |
 | `stonefish_bringup` | Docker 배포 **정본**. 멀티스테이지로 core+sim+slam을 이미지에 bake. `.hq/config/project/env/`는 byte-identical 미러이므로 **수정은 bringup에서** |
 
@@ -127,7 +140,7 @@ import`는 이 설계를 깹니다. slam에는 형제 절대 import까지 stub�
 
 ### 버전 동기
 
-버전은 **repo 단위로** 동기합니다 — sim의 8개 `package.xml`은 0.5.0, slam은 0.4.0.
+버전은 **repo 단위로** 동기합니다 — sim의 10개 `package.xml`은 0.5.0, slam은 0.4.0.
 릴리스 시 해당 repo 내 **모든** `package.xml`을 함께 올리고 `CHANGELOG.md`(Keep a
 Changelog) 정리 후 annotated tag를 답니다.
 
