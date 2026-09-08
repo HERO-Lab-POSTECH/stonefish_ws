@@ -1,7 +1,7 @@
 # docker 환경 자산 생성 관찰 (2026-07-23, omp-env)
 
 - id: decision/004 · date: 2026-07-23 · author: wiki-form-conversion
-- to: all
+- harness: omp · to: all
 - subject: docker-env-genesis · supersedes: none
 - topic: environment
 - confidence: none · status: none

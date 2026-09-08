@@ -20,6 +20,10 @@ convention: **colcon-workspace** (`src/` 소스 + `install/` 빌드 산출물)
 | `.hq/config/project/env` | Docker 환경 자산 미러 — 정본(SSOT)은 [stonefish_bringup](https://github.com/HERO-Lab-POSTECH/stonefish_bringup) repo. byte-identical 유지, 수정은 bringup에서 | ❌ | omp-env (2026-07-23, bringup 이관) |
 | `.hq/config/experiments` | omx 실험 분석 프로파일 — `profile/`이 팀 공유(커밋) | ❌ | omx init (2026-07-23, 2026-08-31 .hq 통합) |
 | `experiments` | omx 런 출력 트리(SSOT, 데이터) — git 비공유, tree.yaml이 스키마 | ❌ | omx init (2026-07-23) |
+| `data` | **외부 수령·비재생 자산 루트** — bag·학습 가중치·고아 런 출력. git 비공유(머신 로컬), 감사 제외. `experiments`와 갈리는 축은 *출처가 아니라 종류*다: `experiments`=omx 런 출력(tree.yaml 스키마 준수), `data`=그 스키마에 안 맞는 덩어리 자산 | ❌ | 2026-09-02 맥→컨테이너 자산 이관 |
+| `data/bags` | rosbag 정본 — 시뮬 녹화·실해역 수령을 **한 곳에** 둔다. 예전 `experiments/bags/`는 tree.yaml에 없는 무단점유였고 omx walk가 런 디렉터리로 오인하므로 2026-09-02 여기로 이관 | ❌ | 2026-09-02 codify |
+| `data/models` | 학습 가중치(.pt) — repo에 안 담기는 바이너리. `stonefish_sonar_yolo` 노드가 `-p model:=<경로>`로 절대경로를 받는다 | ❌ | 2026-09-02 codify |
+| `data/wandb_optimizer_runs` | **고아 자산** — 2025-11 PID optimizer(wandb) 런 72개. 생산 패키지 `stonefish_control_utils`는 삭제됐고 맥 원본도 폐기돼 유일본이라 보존. P5 cascade 이전 게인이므로 현행 아님, 참고 이력 | ❌ | 2026-09-02 보존 결정 |
 
 ## 감사 제외 영역 (ignore)
 
@@ -33,8 +37,11 @@ convention: **colcon-workspace** (`src/` 소스 + `install/` 빌드 산출물)
 - `.hq/**` — 통합 하네스 스토어 (2026-08-31 .omp/·.omx/ 대체)
 - `experiments/**` — omx 런 출력 트리 (2026-07-23 추가)
 - `.sp/**` — superpowers 스크래치 (2026-07-23 추가)
+- `data/**` — 외부 수령 자산 트리 (2026-09-02 추가)
 
 ## 관찰됐으나 규칙은 아닌 것
 
 - **`stonefish` C++ 라이브러리 소스 부재**: `stonefish.repos`는 이 repo도 나열하지만 스캔 시점에 `src/`에 클론 없음. `install/`에 빌드 산출물만 존재 — `vcs import` 미실행 추정(미확인).
+- **`experiments/bags/` 폐지(2026-09-02)**: `tree.yaml`에 `bags`가 없어 omx walk가 이를 런 디렉터리로 보고 `run_dir.requires: [manifest.json]`에 걸렸다. bag 2건(시뮬 2.5GB·실해역 4.5GB)을 `data/bags/`로 통일.
+
 - **중첩 colcon 아티팩트**: `stonefish_thruster_manager/launch/` 하위에 독립 빌드 흔적(build/install/log) — 소스 아님, ignore 처리.

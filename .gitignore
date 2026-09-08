@@ -9,6 +9,11 @@
 # omx run outputs (SSOT tree, data — not shared via git)
 /experiments/
 
+# 외부 수령 자산 (실해역 bag·학습 가중치·고아 런 출력) — 재생성 불가, 머신 로컬.
+# experiments/ 와 갈리는 축은 출처다: experiments/=우리가 만든 omx 런 출력,
+# data/=밖에서 받아온 것. 4.5GB bag 이 여기 있어 추적하면 안 된다.
+/data/
+
 # session/tool state, scratch
 .omc/
 .sp/

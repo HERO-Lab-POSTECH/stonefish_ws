@@ -1,7 +1,7 @@
 # codify 2026-06-23 — 글롭 수정·약어 예외·specificity 재계산
 
 - id: decision/002 · date: 2026-06-23 · author: wiki-form-conversion
-- to: all
+- harness: omp · to: all
 - subject: naming-rules-codify · supersedes: none
 - topic: convention
 - confidence: none · status: none
